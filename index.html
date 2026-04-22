@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PaceTrainer">
 <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <title>Pace Trainer</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -205,6 +206,9 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
       <div class="finish-stat-lbl">Ritmo médio</div>
     </div>
   </div>
+  <div id="finish-map-wrap" style="width:100%;max-width:420px;border-radius:12px;overflow:hidden;border:1px solid var(--border);display:none">
+    <div id="finish-map" style="width:100%;height:220px;background:var(--surface2)"></div>
+  </div>
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px">
     <button id="finish-new-btn" style="background:var(--accent);color:#000;border:none;border-radius:12px;padding:16px 28px;font-weight:900;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">▶ Novo Treino</button>
     <button id="finish-exit-btn" style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:16px 28px;font-weight:700;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">✕ Sair</button>
@@ -311,6 +315,8 @@ var running=false,currentBlock=0,elapsed=0,blockElapsed=0;
 var warningGiven=false,intervalId=null,startTime=null,blockStart=null;
 var audioCtx=null,watchId=null,prevPos=null,prevTime=null;
 var gpsReady=false,lastPaceAlertSec=0,totalDist=0;
+var routePoints=[]; // array de {lat,lng} para o mapa
+var finishMap=null,finishPolyline=null;
 var wakeLock=null,deferredInstall=null;
 
 // ===== PWA INSTALL =====
@@ -409,6 +415,7 @@ function onGPS(pos){
     var dist=R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)),spd=dist/dt;
     if(spd>0.8){
       totalDist+=dist;
+      routePoints.push({lat:pos.coords.latitude,lng:pos.coords.longitude});
       document.getElementById('pm-sim-wrap').style.display='none';
       document.getElementById('dist-val').textContent=(totalDist/1000).toFixed(2)+' km';
       updatePaceMonitor(1000/spd);
@@ -477,7 +484,7 @@ function totalDurSec(){ return blocks.reduce(function(a,b){return a+b.duration*6
 function startWorkout(){
   getAudio();
   running=true; currentBlock=0; elapsed=0; blockElapsed=0;
-  warningGiven=false; lastPaceAlertSec=0; totalDist=0;
+  warningGiven=false; lastPaceAlertSec=0; totalDist=0; routePoints=[];
   startTime=Date.now(); blockStart=Date.now();
   document.getElementById('setup-view').style.display='none';
   document.getElementById('running-view').classList.add('active');
@@ -590,6 +597,47 @@ function showFinish(completed){
   document.getElementById('finish-title').textContent=completed?'Treino Concluído!':'Treino Encerrado';
   document.getElementById('finish-modal').style.display='flex';
   if(distKm>0) falar('Distância percorrida: '+distKm.toFixed(2)+' quilômetros. Velocidade média: '+avgKmh.toFixed(1)+' quilômetros por hora.');
+  // render map after modal is visible
+  setTimeout(renderRouteMap, 100);
+}
+
+function renderRouteMap(){
+  var wrap=document.getElementById('finish-map-wrap');
+  if(routePoints.length<2){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+
+  // destroy previous map instance if any
+  if(finishMap){ finishMap.remove(); finishMap=null; finishPolyline=null; }
+
+  var latlngs=routePoints.map(function(p){return [p.lat,p.lng];});
+
+  finishMap=L.map('finish-map',{
+    zoomControl:true,
+    attributionControl:false,
+    dragging:true,
+    scrollWheelZoom:false
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19
+  }).addTo(finishMap);
+
+  // draw route
+  finishPolyline=L.polyline(latlngs,{
+    color:'#e8ff47',
+    weight:4,
+    opacity:0.9,
+    lineJoin:'round',
+    lineCap:'round'
+  }).addTo(finishMap);
+
+  // start marker (green dot)
+  L.circleMarker(latlngs[0],{radius:7,fillColor:'#47ff8a',color:'#0b0d0f',weight:2,fillOpacity:1}).addTo(finishMap);
+  // end marker (red dot)
+  L.circleMarker(latlngs[latlngs.length-1],{radius:7,fillColor:'#ff4747',color:'#0b0d0f',weight:2,fillOpacity:1}).addTo(finishMap);
+
+  finishMap.fitBounds(finishPolyline.getBounds(),{padding:[16,16]});
+  finishMap.invalidateSize();
 }
 
 function closeFinish(){
@@ -604,5 +652,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load',function(){ nav
 // ===== INIT =====
 renderBlocks(); updateSummary();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </body>
 </html>
