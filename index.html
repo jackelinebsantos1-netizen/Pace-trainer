@@ -157,7 +157,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .log-pace .log-msg{color:var(--orange)}
 
 /* FINISH MODAL */
-#finish-modal{display:none;position:fixed;inset:0;background:rgba(11,13,15,.97);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px}
+#finish-modal{display:none;position:fixed;inset:0;background:rgba(11,13,15,.97);z-index:9999;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 16px 40px;gap:16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .finish-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;text-align:center;min-width:130px;flex:1}
 .finish-stat-val{font-size:1.8rem;font-weight:900;color:var(--accent);font-family:'Courier New',monospace;line-height:1;margin-bottom:4px}
 .finish-stat-lbl{font-family:'Courier New',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.15em;color:var(--muted)}
@@ -219,7 +219,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 <div id="finish-modal">
   <div id="finish-emoji" style="font-size:3.5rem;line-height:1">🏁</div>
   <div id="finish-title" style="font-size:2rem;font-weight:900;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;text-align:center">Treino Concluído!</div>
-  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;width:100%;max-width:420px">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%;max-width:480px">
     <div class="finish-stat">
       <div class="finish-stat-val" id="fin-dist">--</div>
       <div class="finish-stat-lbl">Distância</div>
@@ -237,19 +237,19 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
       <div class="finish-stat-lbl">Ritmo médio</div>
     </div>
   </div>
-  <div id="finish-map-wrap" style="width:100%;max-width:420px;border-radius:12px;overflow:hidden;border:1px solid var(--border);display:none">
+  <div id="finish-map-wrap" style="width:100%;max-width:480px;border-radius:12px;overflow:hidden;border:1px solid var(--border);display:none">
     <div id="finish-map" style="width:100%;height:220px;background:var(--surface2)"></div>
   </div>
-  <div class="splits-wrap" id="splits-wrap">
+  <div class="splits-wrap" id="splits-wrap" style="width:100%;max-width:480px">
     <div class="splits-title">Parciais por km</div>
     <table class="splits-table">
-      <thead><tr><th>Km</th><th>Ritmo</th><th class="split-bar-cell"></th><th>Pace</th></tr></thead>
+      <thead><tr><th>Km</th><th>Ritmo</th><th></th></tr></thead>
       <tbody id="splits-tbody"></tbody>
     </table>
   </div>
 
-  <div class="flyover-wrap" id="flyover-wrap">
-    <div id="flyover-map"></div>
+  <div class="flyover-wrap" id="flyover-wrap" style="width:100%;max-width:480px">
+    <div id="flyover-map" style="width:100%;height:280px;background:var(--surface2)"></div>
     <div class="flyover-controls">
       <button class="flyover-btn" id="flyover-play-btn" onclick="startFlyover()">▶ Flyover 3D</button>
       <button class="flyover-btn stop" id="flyover-stop-btn" onclick="stopFlyover()" style="display:none">⏹ Parar</button>
@@ -375,7 +375,7 @@ var kmSplits=[]; // parciais por km [{km, paceStr, distM}]
 var lastSplitDist=0, lastSplitTime=0;
 var finishMap=null,finishPolyline=null;
 var flyoverMap=null,flyoverAnim=null;
-var mapboxToken=localStorage.getItem('mapbox_token')||'';
+var mapboxToken=localStorage.getItem('mapbox_token')||'pk.eyJ1IjoiamFja2VsaW5lYnNhbnRvczEiLCJhIjoiY21vOXhnamxpMDB1ZzJwcTRmNHM5bWw0ciJ9.P02nu_1w0HEx7_lRNQCJUA';
 var wakeLock=null,deferredInstall=null;
 
 // ===== PWA INSTALL =====
@@ -693,8 +693,7 @@ function renderSplits(){
     tr.innerHTML=
       '<td class="split-km">'+s.km+'</td>'+
       '<td class="split-pace">'+s.paceStr+'</td>'+
-      '<td class="split-bar-cell"><div class="split-bar-bg"><div class="split-bar-fill" style="width:'+barPct+'%"></div></div></td>'+
-      '<td></td>';
+      '<td class="split-bar-cell"><div class="split-bar-bg"><div class="split-bar-fill" style="width:'+barPct+'%"></div></div></td>';
     tbody.appendChild(tr);
   });
 }
@@ -703,11 +702,16 @@ function initFlyover(){
   var wrap=document.getElementById('flyover-wrap');
   if(routePoints.length<2){ wrap.style.display='none'; return; }
   wrap.style.display='block';
-  var tokenInput=document.getElementById('flyover-token-input');
-  tokenInput.value=mapboxToken;
   var tokenWrap=document.getElementById('flyover-token-wrap');
-  if(mapboxToken){ tokenWrap.style.display='none'; initMapboxMap(); }
-  else{ tokenWrap.style.display='flex'; document.getElementById('flyover-play-btn').disabled=true; document.getElementById('flyover-status').textContent='Insira seu token Mapbox'; }
+  if(mapboxToken){
+    tokenWrap.style.display='none';
+    document.getElementById('flyover-token-input').value=mapboxToken;
+    initMapboxMap();
+  } else {
+    tokenWrap.style.display='flex';
+    document.getElementById('flyover-play-btn').disabled=true;
+    document.getElementById('flyover-status').textContent='Insira seu token Mapbox';
+  }
 }
 
 function saveMapboxToken(){
