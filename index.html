@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0b0d0f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PaceTrainer">
+<link rel="manifest" href="manifest.json">
+<title>Pace Trainer</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0b0d0f; --surface: #13161a; --surface2: #1c2026;
+    --border: #2a2f38; --accent: #e8ff47; --accent2: #47ffd4;
+    --red: #ff4747; --orange: #ff9f47; --green: #47ff8a;
+    --text: #e8eaed; --muted: #6b7280;
+  }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: system-ui,-apple-system,sans-serif;
+    min-height: 100vh; min-height: 100dvh;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* INSTALL BANNER */
+  #install-banner {
+    display: none;
+    position: fixed; bottom: 16px; left: 16px; right: 16px;
+    background: var(--surface2); border: 1px solid var(--accent);
+    border-radius: 14px; padding: 14px 16px;
+    z-index: 999; gap: 12px; align-items: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  }
+  #install-banner.show { display: flex; }
+  #install-banner .ib-icon { font-size: 1.8rem; flex-shrink: 0; }
+  #install-banner .ib-text { flex: 1; font-size: .82rem; line-height: 1.4; }
+  #install-banner .ib-text strong { color: var(--accent); display: block; margin-bottom: 2px; }
+  #install-banner .ib-text small { color: var(--muted); font-size: .7rem; }
+  #install-banner .ib-btn { background: var(--accent); color: #000; border: none; border-radius: 10px; padding: 10px 16px; font-weight: 700; font-size: .82rem; cursor: pointer; white-space: nowrap; }
+  #install-banner .ib-close { background: none; border: none; color: var(--muted); font-size: 1.2rem; cursor: pointer; padding: 4px; }
+
+  .app { max-width: 700px; margin: 0 auto; padding: 28px 16px 100px; }
+  h1 { font-size: clamp(2rem,8vw,3.2rem); font-weight: 900; color: var(--accent); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+  .subtitle { font-family: 'Courier New',monospace; font-size: .65rem; color: var(--muted); letter-spacing: .2em; text-transform: uppercase; margin-bottom: 24px; }
+  .section-title { font-family: 'Courier New',monospace; font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+
+  /* GPS BANNER */
+  .gps-banner { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; }
+  .gps-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex-shrink: 0; transition: background .3s; }
+  .gps-dot.on  { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .gps-dot.err { background: var(--red); }
+  .gps-text { font-size: .8rem; flex: 1; }
+  .gps-text small { display: block; font-size: .68rem; color: var(--muted); margin-top: 2px; }
+  .gps-btn { background: var(--accent); color: #000; border: none; border-radius: 8px; padding: 9px 14px; font-weight: 700; font-size: .8rem; cursor: pointer; white-space: nowrap; transition: opacity .2s; }
+  .gps-btn:disabled { opacity: .4; cursor: default; }
+
+  /* BLOCKS */
+  .block-row { display: grid; grid-template-columns: 22px 1fr 70px 82px 72px 28px; gap: 6px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+  .block-index { font-weight: 900; font-size: .95rem; color: var(--muted); text-align: center; }
+  .block-select,.dur-input,.pace-input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 8px; font-size: .8rem; font-family: inherit; outline: none; width: 100%; transition: border-color .2s; }
+  .block-select:focus,.dur-input:focus,.pace-input:focus { border-color: var(--accent); }
+  .pace-input { font-family: 'Courier New',monospace; }
+  .field-wrap label { display: block; font-size: .55rem; color: var(--muted); font-family: 'Courier New',monospace; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 3px; }
+  .block-kmh { font-family: 'Courier New',monospace; font-size: .66rem; color: var(--accent2); text-align: center; }
+  .remove-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 6px; width: 26px; height: 26px; cursor: pointer; font-size: .7rem; transition: all .2s; }
+  .remove-btn:hover { border-color: var(--red); color: var(--red); }
+  .add-btn { background: var(--surface); border: 1px dashed var(--border); color: var(--muted); border-radius: 10px; padding: 10px; width: 100%; cursor: pointer; font-family: 'Courier New',monospace; font-size: .74rem; letter-spacing: .1em; transition: all .2s; margin-bottom: 20px; }
+  .add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .summary { display: flex; gap: 10px; margin-bottom: 20px; }
+  .summary-item { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; }
+  .summary-val { font-size: 1.7rem; font-weight: 900; color: var(--accent); line-height: 1; }
+  .summary-lbl { font-family: 'Courier New',monospace; font-size: .56rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-top: 3px; }
+
+  .start-btn { width: 100%; background: var(--accent); color: #0b0d0f; border: none; border-radius: 12px; padding: 18px; font-weight: 900; font-size: 1.2rem; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all .2s; margin-bottom: 24px; }
+  .start-btn:hover { background: #f5ff6e; }
+  .start-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+  .info-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; font-size: .78rem; color: var(--muted); line-height: 1.8; }
+  .info-box strong { color: var(--text); }
+  .mono { font-family: 'Courier New',monospace; color: var(--accent2); }
+
+  /* RUNNING VIEW */
+  #running-view { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; flex-direction: column; padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); overflow-y: auto; gap: 10px; }
+  #running-view.active { display: flex; }
+
+  .run-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .run-elapsed-lbl { font-family: 'Courier New',monospace; font-size: .58rem; color: var(--muted); text-transform: uppercase; letter-spacing: .15em; }
+  .run-elapsed { font-size: 2.8rem; font-weight: 900; color: var(--accent); line-height: 1; font-variant-numeric: tabular-nums; }
+  .stop-btn { background: var(--surface); border: 1px solid var(--border); color: var(--red); border-radius: 10px; padding: 10px 16px; font-family: 'Courier New',monospace; font-size: .72rem; letter-spacing: .08em; cursor: pointer; transition: all .2s; }
+  .stop-btn:active { background: rgba(255,71,71,.15); }
+
+  .current-block { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; position: relative; overflow: hidden; }
+  .cb-progress-bar { position: absolute; top: 0; left: 0; height: 3px; background: var(--accent); transition: width 1s linear; }
+  .cb-label { font-family: 'Courier New',monospace; font-size: .6rem; text-transform: uppercase; letter-spacing: .15em; color: var(--muted); margin-bottom: 4px; }
+  .cb-name { font-size: 1.5rem; font-weight: 900; text-transform: uppercase; line-height: 1; margin-bottom: 10px; padding-right: 90px; }
+  .cb-remaining { position: absolute; top: 16px; right: 14px; text-align: right; }
+  .cb-remaining-val { font-size: 1.9rem; font-weight: 900; color: var(--accent2); line-height: 1; font-family: 'Courier New',monospace; font-variant-numeric: tabular-nums; }
+  .cb-remaining-lbl { font-family: 'Courier New',monospace; font-size: .54rem; color: var(--muted); text-transform: uppercase; }
+  .cb-stats { display: flex; gap: 14px; flex-wrap: wrap; }
+  .cb-stat-val { font-size: 1.1rem; font-weight: 900; color: var(--accent); line-height: 1; font-family: 'Courier New',monospace; }
+  .cb-stat-lbl { font-family: 'Courier New',monospace; font-size: .54rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+
+  /* PACE MONITOR */
+  .pace-monitor { border-radius: 12px; padding: 14px 16px; border: 2px solid var(--border); transition: border-color .4s, background .4s; background: var(--surface); }
+  .pace-monitor.ok   { border-color: var(--green);  background: rgba(71,255,138,.07); }
+  .pace-monitor.slow { border-color: var(--orange); background: rgba(255,159,71,.07); }
+  .pace-monitor.fast { border-color: var(--accent2);background: rgba(71,255,212,.07); }
+  .pm-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .pm-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); flex-shrink: 0; transition: all .3s; }
+  .pace-monitor.ok   .pm-dot { background: var(--green);  box-shadow: 0 0 8px var(--green); }
+  .pace-monitor.slow .pm-dot { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
+  .pace-monitor.fast .pm-dot { background: var(--accent2);box-shadow: 0 0 8px var(--accent2); }
+  .pm-title { font-family: 'Courier New',monospace; font-size: .6rem; text-transform: uppercase; letter-spacing: .15em; color: var(--muted); }
+  .pm-body { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  .pm-live { font-size: 2rem; font-weight: 900; font-family: 'Courier New',monospace; line-height: 1; font-variant-numeric: tabular-nums; transition: color .3s; }
+  .pace-monitor.ok   .pm-live { color: var(--green); }
+  .pace-monitor.slow .pm-live { color: var(--orange); }
+  .pace-monitor.fast .pm-live { color: var(--accent2); }
+  .pace-monitor.wait .pm-live { color: var(--muted); }
+  .pm-right { display: flex; flex-direction: column; gap: 4px; }
+  .pm-target { font-family: 'Courier New',monospace; font-size: .7rem; color: var(--muted); }
+  .pm-status { font-size: .85rem; font-weight: 700; transition: color .3s; }
+  .pace-monitor.ok   .pm-status { color: var(--green); }
+  .pace-monitor.slow .pm-status { color: var(--orange); }
+  .pace-monitor.fast .pm-status { color: var(--accent2); }
+  .pace-monitor.wait .pm-status { color: var(--muted); font-weight: 400; font-size: .78rem; }
+
+  .pm-sim { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .pm-sim label { font-family: 'Courier New',monospace; font-size: .6rem; color: var(--muted); text-transform: uppercase; white-space: nowrap; }
+  .pm-sim input[type=range] { flex: 1; accent-color: var(--accent); height: 24px; cursor: pointer; }
+  .pm-sim span { font-family: 'Courier New',monospace; font-size: .75rem; color: var(--accent); width: 58px; text-align: right; }
+
+  .total-progress { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+  .prog-labels { display: flex; justify-content: space-between; font-family: 'Courier New',monospace; font-size: .63rem; color: var(--muted); margin-bottom: 6px; }
+  .prog-bg { background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; }
+  .prog-fill { height: 100%; background: linear-gradient(90deg,var(--accent),var(--accent2)); border-radius: 4px; transition: width 1s linear; }
+
+  .upcoming { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+  .upcoming-title { font-family: 'Courier New',monospace; font-size: .6rem; color: var(--muted); text-transform: uppercase; letter-spacing: .15em; margin-bottom: 8px; }
+  .upcoming-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: .82rem; color: var(--muted); border-bottom: 1px solid rgba(255,255,255,.03); }
+  .upcoming-item:last-child { border-bottom: none; }
+  .upcoming-item.active { color: var(--text); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+  .dot.active { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .dot.done { background: var(--accent2); }
+  .upcoming-pace { font-family: 'Courier New',monospace; font-size: .7rem; margin-left: auto; color: var(--accent2); }
+
+  .log { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; max-height: 140px; overflow-y: auto; flex-shrink: 0; }
+  .log-item { display: flex; gap: 10px; font-family: 'Courier New',monospace; font-size: .65rem; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+  .log-time { color: var(--muted); flex-shrink: 0; }
+  .log-info .log-msg    { color: var(--text); }
+  .log-warning .log-msg { color: var(--orange); }
+  .log-change .log-msg  { color: var(--accent2); }
+  .log-start .log-msg   { color: var(--accent); }
+  .log-success .log-msg { color: var(--green); }
+  .log-stop .log-msg    { color: var(--red); }
+  .log-pace .log-msg    { color: var(--orange); }
+
+  /* Keep screen awake hint */
+  .wakelock-badge { display: inline-flex; align-items: center; gap: 5px; font-family: 'Courier New',monospace; font-size: .58rem; color: var(--muted); background: var(--surface2); border-radius: 6px; padding: 3px 8px; margin-left: 8px; vertical-align: middle; }
+  .wakelock-badge.on { color: var(--green); }
+
+  @media(max-width:420px){
+    .block-row { grid-template-columns: 18px 1fr 56px 74px 60px 24px; gap: 4px; padding: 8px; }
+    .run-elapsed { font-size: 2.2rem; }
+    .cb-name { font-size: 1.2rem; }
+    .pm-live { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+  <div class="ib-icon">📲</div>
+  <div class="ib-text">
+    <strong>Instalar como app</strong>
+    <small>Adiciona ícone na tela inicial, funciona offline</small>
+  </div>
+  <button class="ib-btn" id="install-btn">Instalar</button>
+  <button class="ib-close" id="install-close">✕</button>
+</div>
+
+<!-- SETUP VIEW -->
+<div class="app" id="setup-view">
+  <h1>Pace Trainer</h1>
+  <div class="subtitle">Controle de ritmo para corrida</div>
+
+  <div class="gps-banner">
+    <div class="gps-dot" id="setup-gps-dot"></div>
+    <div class="gps-text">
+      <span id="setup-gps-text">GPS não ativado</span>
+      <small id="setup-gps-sub">Ative para monitorar seu ritmo em tempo real</small>
+    </div>
+    <button class="gps-btn" id="setup-gps-btn" onclick="requestGPS()">Ativar GPS</button>
+  </div>
+
+  <div class="section-title">Blocos de treino</div>
+  <div id="blocks-container"></div>
+  <button class="add-btn" onclick="addBlock()">+ Adicionar bloco</button>
+
+  <div class="summary">
+    <div class="summary-item"><div class="summary-val" id="sum-blocks">3</div><div class="summary-lbl">Blocos</div></div>
+    <div class="summary-item"><div class="summary-val" id="sum-minutes">47</div><div class="summary-lbl">Minutos</div></div>
+    <div class="summary-item"><div class="summary-val" id="sum-pace">--</div><div class="summary-lbl">Ritmo médio</div></div>
+  </div>
+
+  <button class="start-btn" id="start-btn" onclick="startWorkout()">▶ Iniciar Treino</button>
+
+  <div class="section-title">Como usar</div>
+  <div class="info-box">
+    1. <strong>Instale o app</strong> pelo banner acima (se aparecer) para ter ícone na tela inicial.<br>
+    2. <strong>Ative o GPS</strong> — o Chrome pedirá permissão de localização.<br>
+    3. Configure os blocos: nome, duração em minutos e ritmo (<span class="mono">min:seg</span>, ex: <span class="mono">5:49</span>).<br>
+    4. <strong>Alertas sonoros</strong> 30s antes de cada troca de bloco.<br>
+    5. Monitor mostra: <strong style="color:var(--green)">✓ no ritmo</strong> · <strong style="color:var(--orange)">▲ mais lento</strong> · <strong style="color:var(--accent2)">▼ mais rápido</strong>.<br>
+    6. Sem GPS? Use o <strong>simulador de ritmo</strong> (slider) durante o treino.
+  </div>
+</div>
+
+<!-- RUNNING VIEW -->
+<div id="running-view">
+  <div class="run-header">
+    <div>
+      <div class="run-elapsed-lbl">
+        Tempo total
+        <span class="wakelock-badge" id="wakelock-badge">💤 tela livre</span>
+      </div>
+      <div class="run-elapsed" id="run-elapsed">00:00</div>
+    </div>
+    <button class="stop-btn" onclick="stopWorkout()">⏹ PARAR</button>
+  </div>
+
+  <div class="current-block">
+    <div class="cb-progress-bar" id="cb-progress-bar" style="width:0%"></div>
+    <div class="cb-label" id="cb-label">Bloco 1/3</div>
+    <div class="cb-name" id="cb-name">Aquecimento</div>
+    <div class="cb-remaining">
+      <div class="cb-remaining-val" id="cb-remaining">10:00</div>
+      <div class="cb-remaining-lbl">restante</div>
+    </div>
+    <div class="cb-stats">
+      <div><div class="cb-stat-val" id="cb-pace">7:13</div><div class="cb-stat-lbl">/km alvo</div></div>
+      <div><div class="cb-stat-val" id="cb-kmh">--</div><div class="cb-stat-lbl">km/h</div></div>
+      <div><div class="cb-stat-val" id="cb-elapsed-block">00:00</div><div class="cb-stat-lbl">neste bloco</div></div>
+    </div>
+  </div>
+
+  <div class="pace-monitor wait" id="pace-monitor">
+    <div class="pm-top"><div class="pm-dot"></div><div class="pm-title">Monitor de ritmo</div></div>
+    <div class="pm-body">
+      <div class="pm-live" id="pm-live">--:--</div>
+      <div class="pm-right">
+        <div class="pm-target" id="pm-target">Alvo: -- /km</div>
+        <div class="pm-status" id="pm-status">Aguardando GPS...</div>
+      </div>
+    </div>
+    <div class="pm-sim" id="pm-sim-wrap">
+      <label>Simular:</label>
+      <input type="range" id="sim-slider" min="240" max="900" value="600" oninput="simulatePace(+this.value)">
+      <span id="sim-label">10:00/km</span>
+    </div>
+  </div>
+
+  <div class="total-progress">
+    <div class="prog-labels"><span>Progresso total</span><span id="prog-pct">0%</span></div>
+    <div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="upcoming">
+    <div class="upcoming-title">Sequência</div>
+    <div id="upcoming-list"></div>
+  </div>
+
+  <div class="log" id="log"></div>
+</div>
+
+<script>
+// ===== DATA =====
+let blocks = [
+  { label:"Aquecimento",     duration:10, pace:"7:13" },
+  { label:"Bloco Principal", duration:32, pace:"5:49" },
+  { label:"Volta à Calma",   duration:5,  pace:"7:13" },
+];
+const LABELS = ["Aquecimento","Bloco Principal","Volta à Calma","Personalizado"];
+
+// ===== STATE =====
+let running=false, currentBlock=0, elapsed=0, blockElapsed=0;
+let warningGiven=false, intervalId=null, startTime=null, blockStart=null;
+let audioCtx=null, watchId=null, prevPos=null, prevTime=null;
+let gpsReady=false, usingRealGPS=false, lastPaceAlertSec=0;
+let wakeLock=null;
+let deferredInstall=null;
+
+// ===== PWA INSTALL =====
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredInstall=e;
+  document.getElementById('install-banner').classList.add('show');
+});
+document.getElementById('install-btn').addEventListener('click', function(){
+  if(!deferredInstall) return;
+  deferredInstall.prompt();
+  deferredInstall.userChoice.then(function(){
+    document.getElementById('install-banner').classList.remove('show');
+    deferredInstall=null;
+  });
+});
+document.getElementById('install-close').addEventListener('click', function(){
+  document.getElementById('install-banner').classList.remove('show');
+});
+window.addEventListener('appinstalled', function(){
+  document.getElementById('install-banner').classList.remove('show');
+});
+
+// ===== WAKE LOCK (keep screen on) =====
+async function requestWakeLock(){
+  if(!('wakeLock' in navigator)) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    document.getElementById('wakelock-badge').textContent='🔆 tela ativa';
+    document.getElementById('wakelock-badge').classList.add('on');
+    wakeLock.addEventListener('release', function(){ wakeLock=null; });
+  } catch(e){}
+}
+function releaseWakeLock(){
+  if(wakeLock){ wakeLock.release(); wakeLock=null; }
+  const b=document.getElementById('wakelock-badge');
+  b.textContent='💤 tela livre'; b.classList.remove('on');
+}
+
+// ===== AUDIO =====
+function getAudio(){
+  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  return audioCtx;
+}
+function playTones(freqs,delays,vol){
+  vol=vol||0.35;
+  try{
+    const ctx=getAudio();
+    freqs.forEach(function(f,i){
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value=f;
+      const t=ctx.currentTime+(delays[i]||0);
+      g.gain.setValueAtTime(vol,t);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.25);
+      o.start(t); o.stop(t+0.3);
+    });
+  }catch(e){}
+}
+function playWarning(){ playTones([660,880],[0,0.18]); }
+function playChange(){  playTones([440,554,660],[0,0.13,0.26]); }
+function playEnd(){     playTones([660,554,440,330],[0,0.15,0.30,0.45],0.5); }
+function playPaceSlow(){ playTones([370,330],[0,0.22],0.28); }
+function playPaceFast(){ playTones([660,740],[0,0.18],0.28); }
+
+// ===== UTILS =====
+function paceValid(p){ return /^\d{1,2}:\d{2}$/.test(p); }
+function paceToSec(p){ var a=p.split(':').map(Number); return a[0]*60+a[1]; }
+function secToPace(s){ s=Math.max(0,Math.floor(s)); return Math.floor(s/60)+':'+(s%60).toString().padStart(2,'0'); }
+function paceToKmh(p){ return (3600/paceToSec(p)).toFixed(1); }
+function fmt(s){ s=Math.max(0,Math.floor(s)); return Math.floor(s/60).toString().padStart(2,'0')+':'+(s%60).toString().padStart(2,'0'); }
+
+// ===== GPS =====
+function requestGPS(){
+  var btn=document.getElementById('setup-gps-btn');
+  var dot=document.getElementById('setup-gps-dot');
+  var txt=document.getElementById('setup-gps-text');
+  var sub=document.getElementById('setup-gps-sub');
+  btn.disabled=true; btn.textContent='Aguardando...';
+  if(!navigator.geolocation){
+    dot.className='gps-dot err';
+    txt.textContent='GPS não suportado';
+    sub.textContent='Use o simulador de ritmo durante o treino.';
+    btn.textContent='Indisponível'; return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    function(){
+      gpsReady=true;
+      dot.className='gps-dot on';
+      txt.textContent='GPS ativo ✓';
+      sub.textContent='Ritmo será monitorado em tempo real.';
+      btn.textContent='Ativo ✓';
+    },
+    function(err){
+      dot.className='gps-dot err';
+      txt.textContent=err.code===1?'Permissão negada':'GPS indisponível';
+      sub.textContent=err.code===1?
+        'Toque no cadeado 🔒 na barra de endereço → Permissões → Localização → Permitir':
+        'Verifique se o GPS está ligado no celular.';
+      btn.disabled=false; btn.textContent='Tentar novamente';
+    },
+    {enableHighAccuracy:true,timeout:12000,maximumAge:0}
+  );
+}
+
+function startGPSWatch(){
+  if(!navigator.geolocation||!gpsReady) return;
+  prevPos=null; prevTime=null; usingRealGPS=false;
+  watchId=navigator.geolocation.watchPosition(onGPS,function(){},{enableHighAccuracy:true,maximumAge:1000,timeout:10000});
+}
+function stopGPSWatch(){ if(watchId!==null){ navigator.geolocation.clearWatch(watchId); watchId=null; } }
+
+function onGPS(pos){
+  var now=Date.now();
+  if(prevPos&&prevTime){
+    var dt=(now-prevTime)/1000;
+    if(dt<0.8){ prevPos=pos; prevTime=now; return; }
+    var R=6371000;
+    var lat1=prevPos.coords.latitude*Math.PI/180;
+    var lat2=pos.coords.latitude*Math.PI/180;
+    var dLat=(pos.coords.latitude-prevPos.coords.latitude)*Math.PI/180;
+    var dLon=(pos.coords.longitude-prevPos.coords.longitude)*Math.PI/180;
+    var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)*Math.sin(dLon/2);
+    var dist=R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+    var spd=dist/dt;
+    if(spd>0.8){
+      usingRealGPS=true;
+      document.getElementById('pm-sim-wrap').style.display='none';
+      updatePaceMonitor(1000/spd);
+    }
+  }
+  prevPos=pos; prevTime=now;
+}
+
+// ===== PACE MONITOR =====
+function updatePaceMonitor(secPerKm){
+  if(!running) return;
+  var block=blocks[currentBlock];
+  if(!block||!paceValid(block.pace)) return;
+  var targetSec=paceToSec(block.pace);
+  var diff=secPerKm-targetSec;
+  var livePace=secToPace(secPerKm);
+  var mon=document.getElementById('pace-monitor');
+  var nowSec=Date.now()/1000;
+  document.getElementById('pm-live').textContent=livePace+' /km';
+  document.getElementById('pm-target').textContent='Alvo: '+block.pace+' /km';
+  if(Math.abs(diff)<=12){
+    mon.className='pace-monitor ok';
+    document.getElementById('pm-status').textContent='✓ No ritmo certo!';
+  } else if(diff>0){
+    mon.className='pace-monitor slow';
+    document.getElementById('pm-status').textContent='▲ '+secToPace(Math.abs(diff))+' mais lento';
+    if(nowSec-lastPaceAlertSec>20){ lastPaceAlertSec=nowSec; playPaceSlow(); addLog('▲ Ritmo '+livePace+'/km — alvo '+block.pace+'/km (mais lento)','pace'); }
+  } else {
+    mon.className='pace-monitor fast';
+    document.getElementById('pm-status').textContent='▼ '+secToPace(Math.abs(diff))+' mais rápido';
+    if(nowSec-lastPaceAlertSec>20){ lastPaceAlertSec=nowSec; playPaceFast(); addLog('▼ Ritmo '+livePace+'/km — alvo '+block.pace+'/km (mais rápido)','pace'); }
+  }
+}
+
+function simulatePace(sec){
+  document.getElementById('sim-label').textContent=secToPace(sec)+'/km';
+  updatePaceMonitor(sec);
+}
+
+// ===== RENDER BLOCKS =====
+function renderBlocks(){
+  var c=document.getElementById('blocks-container');
+  c.innerHTML='';
+  blocks.forEach(function(b,i){
+    var row=document.createElement('div');
+    row.className='block-row';
+    var opts=LABELS.map(function(l){ return '<option'+(l===b.label?' selected':'')+'>'+l+'</option>'; }).join('');
+    var kmh=paceValid(b.pace)?paceToKmh(b.pace)+' km/h':'--';
+    row.innerHTML=
+      '<div class="block-index">'+(i+1)+'</div>'+
+      '<select class="block-select" onchange="updateBlock('+i+',\'label\',this.value)">'+opts+'</select>'+
+      '<div class="field-wrap"><label>Min</label><input type="number" class="dur-input" min="1" max="999" value="'+b.duration+'" oninput="updateBlock('+i+',\'duration\',+this.value)"></div>'+
+      '<div class="field-wrap"><label>Ritmo/km</label><input type="text" class="pace-input" placeholder="5:30" maxlength="5" value="'+b.pace+'" oninput="updateBlock('+i+',\'pace\',this.value)"></div>'+
+      '<div class="block-kmh" id="kmh-'+i+'">'+kmh+'</div>'+
+      '<button class="remove-btn" onclick="removeBlock('+i+')">✕</button>';
+    c.appendChild(row);
+  });
+  updateSummary();
+}
+function updateBlock(i,field,value){
+  blocks[i][field]=value;
+  if(field==='pace'){
+    var el=document.getElementById('kmh-'+i);
+    if(el) el.textContent=paceValid(value)?paceToKmh(value)+' km/h':'--';
+  }
+  updateSummary();
+}
+function addBlock(){ blocks.push({label:'Personalizado',duration:10,pace:'6:00'}); renderBlocks(); }
+function removeBlock(i){ blocks.splice(i,1); renderBlocks(); }
+function updateSummary(){
+  document.getElementById('sum-blocks').textContent=blocks.length;
+  document.getElementById('sum-minutes').textContent=blocks.reduce(function(a,b){return a+b.duration;},0);
+  var valid=blocks.filter(function(b){return paceValid(b.pace);});
+  if(valid.length){
+    var td=valid.reduce(function(a,b){return a+b.duration;},0);
+    document.getElementById('sum-pace').textContent=secToPace(valid.reduce(function(a,b){return a+paceToSec(b.pace)*b.duration;},0)/td);
+  } else { document.getElementById('sum-pace').textContent='--'; }
+}
+
+// ===== WORKOUT =====
+function totalDurSec(){ return blocks.reduce(function(a,b){return a+b.duration*60;},0); }
+
+function startWorkout(){
+  getAudio();
+  running=true; currentBlock=0; elapsed=0; blockElapsed=0;
+  warningGiven=false; lastPaceAlertSec=0;
+  startTime=Date.now(); blockStart=Date.now();
+  document.getElementById('setup-view').style.display='none';
+  document.getElementById('running-view').classList.add('active');
+  document.getElementById('log').innerHTML='';
+  var mon=document.getElementById('pace-monitor');
+  mon.className='pace-monitor wait';
+  document.getElementById('pm-live').textContent='--:--';
+  document.getElementById('pm-status').textContent=gpsReady?'Aguardando sinal GPS...':'Use o simulador abaixo';
+  document.getElementById('pm-sim-wrap').style.display='flex';
+  document.getElementById('sim-slider').value=600;
+  document.getElementById('sim-label').textContent='10:00/km';
+  addLog('▶ Iniciando: '+blocks[0].label+' — alvo '+blocks[0].pace+'/km','start');
+  playChange();
+  renderUpcoming(); updateRunUI();
+  startGPSWatch();
+  requestWakeLock();
+  intervalId=setInterval(tick,1000);
+}
+
+function stopWorkout(){
+  running=false; clearInterval(intervalId);
+  stopGPSWatch(); releaseWakeLock();
+  addLog('⏹ Treino encerrado','stop');
+  setTimeout(function(){
+    document.getElementById('running-view').classList.remove('active');
+    document.getElementById('setup-view').style.display='';
+  },1000);
+}
+
+function tick(){
+  var now=Date.now();
+  elapsed=Math.floor((now-startTime)/1000);
+  blockElapsed=Math.floor((now-blockStart)/1000);
+  var block=blocks[currentBlock];
+  var blockDur=block.duration*60;
+  var remaining=blockDur-blockElapsed;
+  if(remaining===30&&!warningGiven){
+    warningGiven=true; playWarning();
+    var next=blocks[currentBlock+1];
+    addLog('⚠ 30s para mudar → '+(next?next.label:'FIM do treino'),'warning');
+  }
+  if(blockElapsed>=blockDur){
+    var nextIdx=currentBlock+1;
+    if(nextIdx>=blocks.length){
+      playEnd(); addLog('🏁 Treino concluído! Parabéns!','success');
+      running=false; clearInterval(intervalId); stopGPSWatch(); releaseWakeLock();
+      updateRunUI(); return;
+    } else {
+      currentBlock=nextIdx; blockStart=now; blockElapsed=0; warningGiven=false; lastPaceAlertSec=0;
+      playChange();
+      addLog('🔄 '+blocks[nextIdx].label+' — alvo '+blocks[nextIdx].pace+'/km','change');
+      renderUpcoming();
+    }
+  }
+  updateRunUI();
+}
+
+function updateRunUI(){
+  var block=blocks[currentBlock];
+  var blockDur=block.duration*60;
+  var remaining=Math.max(0,blockDur-blockElapsed);
+  var bprog=Math.min((blockElapsed/blockDur)*100,100);
+  var tprog=Math.min((elapsed/totalDurSec())*100,100);
+  document.getElementById('run-elapsed').textContent=fmt(elapsed);
+  document.getElementById('cb-label').textContent='Bloco '+(currentBlock+1)+'/'+blocks.length;
+  document.getElementById('cb-name').textContent=block.label;
+  document.getElementById('cb-remaining').textContent=fmt(remaining);
+  document.getElementById('cb-pace').textContent=block.pace;
+  document.getElementById('cb-kmh').textContent=paceToKmh(block.pace);
+  document.getElementById('cb-elapsed-block').textContent=fmt(blockElapsed);
+  document.getElementById('cb-progress-bar').style.width=bprog+'%';
+  document.getElementById('prog-fill').style.width=tprog+'%';
+  document.getElementById('prog-pct').textContent=Math.round(tprog)+'%';
+  document.getElementById('pm-target').textContent='Alvo: '+block.pace+' /km';
+}
+
+function renderUpcoming(){
+  var list=document.getElementById('upcoming-list');
+  list.innerHTML='';
+  blocks.forEach(function(b,i){
+    var div=document.createElement('div');
+    div.className='upcoming-item'+(i===currentBlock?' active':'');
+    var dc=i<currentBlock?'done':i===currentBlock?'active':'';
+    div.innerHTML='<div class="dot '+dc+'"></div><span>'+b.label+'</span><span style="margin-left:6px;font-size:.7rem;color:var(--muted)">'+b.duration+'min</span><span class="upcoming-pace">'+b.pace+'/km</span>';
+    list.appendChild(div);
+  });
+}
+
+function addLog(msg,type){
+  var log=document.getElementById('log');
+  var t=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  var item=document.createElement('div');
+  item.className='log-item log-'+type;
+  item.innerHTML='<span class="log-time">'+t+'</span><span class="log-msg">'+msg+'</span>';
+  log.insertBefore(item,log.firstChild);
+}
+
+// ===== SERVICE WORKER =====
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
+}
+
+// ===== INIT =====
+renderBlocks(); updateSummary();
+</script>
+</body>
+</html>
