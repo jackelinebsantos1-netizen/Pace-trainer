@@ -487,7 +487,6 @@ function onGPS(pos){
         }
         lastSplitDist=totalDist; lastSplitTime=now;
       }
-      if(lastSplitTime===0) lastSplitTime=now;
       document.getElementById('pm-sim-wrap').style.display='none';
       document.getElementById('dist-val').textContent=(totalDist/1000).toFixed(2)+' km';
       updatePaceMonitor(1000/spd);
@@ -556,7 +555,7 @@ function totalDurSec(){ return blocks.reduce(function(a,b){return a+b.duration*6
 function startWorkout(){
   getAudio();
   running=true; currentBlock=0; elapsed=0; blockElapsed=0;
-  warningGiven=false; lastPaceAlertSec=0; totalDist=0; routePoints=[]; kmSplits=[]; lastSplitDist=0; lastSplitTime=0;
+  warningGiven=false; lastPaceAlertSec=0; totalDist=0; routePoints=[]; kmSplits=[]; lastSplitDist=0; lastSplitTime=Date.now();
   startTime=Date.now(); blockStart=Date.now();
   document.getElementById('setup-view').style.display='none';
   document.getElementById('running-view').classList.add('active');
@@ -668,7 +667,7 @@ function showFinish(completed){
   document.getElementById('finish-emoji').textContent=completed?'🏁':'⏹';
   document.getElementById('finish-title').textContent=completed?'Treino Concluído!':'Treino Encerrado';
   // add last partial km if any distance remaining
-  if(routePoints.length>0&&totalDist-lastSplitDist>100){
+  if(routePoints.length>0&&totalDist-lastSplitDist>50){
     var remDist=totalDist-lastSplitDist;
     var remTime=(Date.now()-lastSplitTime)/1000;
     if(remDist>0&&remTime>0) kmSplits.push({km:'+'+(remDist/1000).toFixed(1),paceStr:secToPace(remTime/(remDist/1000)),paceSec:remTime/(remDist/1000)});
@@ -680,6 +679,22 @@ function showFinish(completed){
 
 function renderSplits(){
   var wrap=document.getElementById('splits-wrap');
+  // fallback: build estimated splits from block timing if no GPS
+  if(kmSplits.length===0 && elapsed>0){
+    var estSplits=[];
+    var runSec=0;
+    blocks.forEach(function(b){
+      if(!paceValid(b.pace)) return;
+      var blockSec=b.duration*60;
+      var paceSec=paceToSec(b.pace);
+      var distKm=blockSec/paceSec;
+      var fullKms=Math.floor(distKm);
+      for(var k=0;k<fullKms;k++) estSplits.push({km:estSplits.length+1,paceStr:b.pace,paceSec:paceSec});
+      if(distKm-fullKms>0.05) estSplits.push({km:'+'+(distKm-fullKms).toFixed(1),paceStr:b.pace,paceSec:paceSec});
+      runSec+=blockSec;
+    });
+    if(estSplits.length>0) kmSplits=estSplits;
+  }
   if(kmSplits.length===0){ wrap.style.display='none'; return; }
   wrap.style.display='block';
   var fastest=Math.min.apply(null,kmSplits.map(function(s){return s.paceSec;}));
