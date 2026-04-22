@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="PaceTrainer">
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
 <title>Pace Trainer</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -161,7 +162,37 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .finish-stat-val{font-size:1.8rem;font-weight:900;color:var(--accent);font-family:'Courier New',monospace;line-height:1;margin-bottom:4px}
 .finish-stat-lbl{font-family:'Courier New',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.15em;color:var(--muted)}
 
-@media(max-width:420px){
+/* SPLITS TABLE */
+.splits-wrap{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:none}
+.splits-title{font-family:"Courier New",monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);padding:10px 14px 6px}
+.splits-table{width:100%;border-collapse:collapse}
+.splits-table th{font-family:"Courier New",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);padding:4px 14px 6px;text-align:left;border-bottom:1px solid var(--border)}
+.splits-table th:last-child{text-align:right}
+.splits-table td{padding:5px 14px;font-family:"Courier New",monospace;font-size:.82rem;color:var(--text);vertical-align:middle}
+.splits-table td:last-child{text-align:right;color:var(--muted);font-size:.75rem}
+.splits-table tr:not(:last-child) td{border-bottom:1px solid rgba(255,255,255,.04)}
+.split-bar-cell{width:55%;padding:5px 14px 5px 0}
+.split-bar-bg{background:var(--surface2);border-radius:20px;height:14px;overflow:hidden}
+.split-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#3b82f6,#60a5fa);transition:width .6s ease}
+.split-km{font-weight:700;color:var(--muted);font-size:.78rem;min-width:28px}
+.split-pace{color:var(--text);min-width:48px}
+
+/* FLYOVER */
+.flyover-wrap{width:100%;max-width:420px;border-radius:12px;overflow:hidden;border:1px solid var(--border);display:none}
+#flyover-map{width:100%;height:260px}
+.flyover-controls{display:flex;gap:8px;padding:10px 12px;background:var(--surface);border-top:1px solid var(--border);align-items:center;flex-wrap:wrap}
+.flyover-btn{background:var(--accent);color:#000;border:none;border-radius:8px;padding:8px 16px;font-weight:700;font-size:.78rem;cursor:pointer;transition:opacity .2s}
+.flyover-btn:disabled{opacity:.35;cursor:default}
+.flyover-btn.stop{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.flyover-token-wrap{display:flex;flex-direction:column;gap:4px;width:100%;margin-top:4px;padding:0 12px 10px;background:var(--surface)}
+.flyover-token-wrap label{font-family:"Courier New",monospace;font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.flyover-token-row{display:flex;gap:6px}
+.flyover-token-input{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 10px;font-family:"Courier New",monospace;font-size:.75rem;outline:none}
+.flyover-token-input:focus{border-color:var(--accent)}
+.flyover-token-save{background:var(--accent);color:#000;border:none;border-radius:6px;padding:7px 12px;font-weight:700;font-size:.75rem;cursor:pointer;white-space:nowrap}
+.flyover-status{font-family:"Courier New",monospace;font-size:.65rem;color:var(--muted);margin-left:auto}
+
+@media(max-width:420px){@media(max-width:420px){
   .block-row{grid-template-columns:18px 1fr 56px 74px 60px 24px;gap:4px;padding:8px}
   .run-elapsed{font-size:2.2rem}
   .cb-name{font-size:1.2rem}
@@ -209,6 +240,30 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
   <div id="finish-map-wrap" style="width:100%;max-width:420px;border-radius:12px;overflow:hidden;border:1px solid var(--border);display:none">
     <div id="finish-map" style="width:100%;height:220px;background:var(--surface2)"></div>
   </div>
+  <div class="splits-wrap" id="splits-wrap">
+    <div class="splits-title">Parciais por km</div>
+    <table class="splits-table">
+      <thead><tr><th>Km</th><th>Ritmo</th><th class="split-bar-cell"></th><th>Pace</th></tr></thead>
+      <tbody id="splits-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="flyover-wrap" id="flyover-wrap">
+    <div id="flyover-map"></div>
+    <div class="flyover-controls">
+      <button class="flyover-btn" id="flyover-play-btn" onclick="startFlyover()">▶ Flyover 3D</button>
+      <button class="flyover-btn stop" id="flyover-stop-btn" onclick="stopFlyover()" style="display:none">⏹ Parar</button>
+      <span class="flyover-status" id="flyover-status"></span>
+    </div>
+    <div class="flyover-token-wrap" id="flyover-token-wrap">
+      <label>Token Mapbox (gratuito em mapbox.com)</label>
+      <div class="flyover-token-row">
+        <input type="text" class="flyover-token-input" id="flyover-token-input" placeholder="pk.eyJ1..." value="">
+        <button class="flyover-token-save" onclick="saveMapboxToken()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px">
     <button id="finish-new-btn" style="background:var(--accent);color:#000;border:none;border-radius:12px;padding:16px 28px;font-weight:900;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">▶ Novo Treino</button>
     <button id="finish-exit-btn" style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:16px 28px;font-weight:700;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">✕ Sair</button>
@@ -315,8 +370,12 @@ var running=false,currentBlock=0,elapsed=0,blockElapsed=0;
 var warningGiven=false,intervalId=null,startTime=null,blockStart=null;
 var audioCtx=null,watchId=null,prevPos=null,prevTime=null;
 var gpsReady=false,lastPaceAlertSec=0,totalDist=0;
-var routePoints=[]; // array de {lat,lng} para o mapa
+var routePoints=[]; // array de {lat,lng,time} para o mapa
+var kmSplits=[]; // parciais por km [{km, paceStr, distM}]
+var lastSplitDist=0, lastSplitTime=0;
 var finishMap=null,finishPolyline=null;
+var flyoverMap=null,flyoverAnim=null;
+var mapboxToken=localStorage.getItem('mapbox_token')||'';
 var wakeLock=null,deferredInstall=null;
 
 // ===== PWA INSTALL =====
@@ -415,7 +474,20 @@ function onGPS(pos){
     var dist=R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)),spd=dist/dt;
     if(spd>0.8){
       totalDist+=dist;
-      routePoints.push({lat:pos.coords.latitude,lng:pos.coords.longitude});
+      routePoints.push({lat:pos.coords.latitude,lng:pos.coords.longitude,t:now});
+      // km split detection
+      var prevKm=Math.floor((totalDist-dist)/1000);
+      var currKm=Math.floor(totalDist/1000);
+      if(currKm>prevKm && currKm>0){
+        var splitDist=totalDist-lastSplitDist;
+        var splitTime=(now-lastSplitTime)/1000;
+        if(splitTime>0&&splitDist>0){
+          var splitPaceSec=splitTime/(splitDist/1000);
+          kmSplits.push({km:currKm,paceStr:secToPace(splitPaceSec),paceSec:splitPaceSec});
+        }
+        lastSplitDist=totalDist; lastSplitTime=now;
+      }
+      if(lastSplitTime===0) lastSplitTime=now;
       document.getElementById('pm-sim-wrap').style.display='none';
       document.getElementById('dist-val').textContent=(totalDist/1000).toFixed(2)+' km';
       updatePaceMonitor(1000/spd);
@@ -484,7 +556,7 @@ function totalDurSec(){ return blocks.reduce(function(a,b){return a+b.duration*6
 function startWorkout(){
   getAudio();
   running=true; currentBlock=0; elapsed=0; blockElapsed=0;
-  warningGiven=false; lastPaceAlertSec=0; totalDist=0; routePoints=[];
+  warningGiven=false; lastPaceAlertSec=0; totalDist=0; routePoints=[]; kmSplits=[]; lastSplitDist=0; lastSplitTime=0;
   startTime=Date.now(); blockStart=Date.now();
   document.getElementById('setup-view').style.display='none';
   document.getElementById('running-view').classList.add('active');
@@ -595,10 +667,117 @@ function showFinish(completed){
   document.getElementById('fin-pace').textContent=avgPaceSec>0?secToPace(avgPaceSec)+' /km':'--';
   document.getElementById('finish-emoji').textContent=completed?'🏁':'⏹';
   document.getElementById('finish-title').textContent=completed?'Treino Concluído!':'Treino Encerrado';
+  // add last partial km if any distance remaining
+  if(routePoints.length>0&&totalDist-lastSplitDist>100){
+    var remDist=totalDist-lastSplitDist;
+    var remTime=(Date.now()-lastSplitTime)/1000;
+    if(remDist>0&&remTime>0) kmSplits.push({km:'+'+(remDist/1000).toFixed(1),paceStr:secToPace(remTime/(remDist/1000)),paceSec:remTime/(remDist/1000)});
+  }
   document.getElementById('finish-modal').style.display='flex';
   if(distKm>0) falar('Distância percorrida: '+distKm.toFixed(2)+' quilômetros. Velocidade média: '+avgKmh.toFixed(1)+' quilômetros por hora.');
-  // render map after modal is visible
-  setTimeout(renderRouteMap, 100);
+  setTimeout(function(){ renderRouteMap(); renderSplits(); initFlyover(); }, 120);
+}
+
+function renderSplits(){
+  var wrap=document.getElementById('splits-wrap');
+  if(kmSplits.length===0){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  var fastest=Math.min.apply(null,kmSplits.map(function(s){return s.paceSec;}));
+  var slowest=Math.max.apply(null,kmSplits.map(function(s){return s.paceSec;}));
+  var range=slowest-fastest||1;
+  var tbody=document.getElementById('splits-tbody');
+  tbody.innerHTML='';
+  kmSplits.forEach(function(s){
+    var barPct=Math.round(30+70*((slowest-s.paceSec)/range));
+    var tr=document.createElement('tr');
+    tr.innerHTML=
+      '<td class="split-km">'+s.km+'</td>'+
+      '<td class="split-pace">'+s.paceStr+'</td>'+
+      '<td class="split-bar-cell"><div class="split-bar-bg"><div class="split-bar-fill" style="width:'+barPct+'%"></div></div></td>'+
+      '<td></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function initFlyover(){
+  var wrap=document.getElementById('flyover-wrap');
+  if(routePoints.length<2){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  var tokenInput=document.getElementById('flyover-token-input');
+  tokenInput.value=mapboxToken;
+  var tokenWrap=document.getElementById('flyover-token-wrap');
+  if(mapboxToken){ tokenWrap.style.display='none'; initMapboxMap(); }
+  else{ tokenWrap.style.display='flex'; document.getElementById('flyover-play-btn').disabled=true; document.getElementById('flyover-status').textContent='Insira seu token Mapbox'; }
+}
+
+function saveMapboxToken(){
+  var t=document.getElementById('flyover-token-input').value.trim();
+  if(!t.startsWith('pk.')){ alert('Token inválido. Deve começar com pk.'); return; }
+  mapboxToken=t; localStorage.setItem('mapbox_token',t);
+  document.getElementById('flyover-token-wrap').style.display='none';
+  document.getElementById('flyover-play-btn').disabled=false;
+  document.getElementById('flyover-status').textContent='';
+  initMapboxMap();
+}
+
+function initMapboxMap(){
+  if(!mapboxToken||routePoints.length<2) return;
+  if(flyoverMap){ flyoverMap.remove(); flyoverMap=null; }
+  mapboxgl.accessToken=mapboxToken;
+  var coords=routePoints.map(function(p){return [p.lng,p.lat];});
+  var center=coords[0];
+  flyoverMap=new mapboxgl.Map({
+    container:'flyover-map',
+    style:'mapbox://styles/mapbox/satellite-streets-v12',
+    center:center, zoom:15, pitch:60, bearing:0,
+    antialias:true
+  });
+  flyoverMap.on('load',function(){
+    flyoverMap.addSource('terrain',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512,maxzoom:14});
+    flyoverMap.setTerrain({source:'terrain',exaggeration:1.5});
+    flyoverMap.addSource('route',{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:coords}}});
+    flyoverMap.addLayer({id:'route-line',type:'line',source:'route',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':'#e8ff47','line-width':4,'line-opacity':0.9}});
+    // start/end markers
+    new mapboxgl.Marker({color:'#47ff8a'}).setLngLat(coords[0]).addTo(flyoverMap);
+    new mapboxgl.Marker({color:'#ff4747'}).setLngLat(coords[coords.length-1]).addTo(flyoverMap);
+    // fit to route
+    var bounds=coords.reduce(function(b,c){return b.extend(c);},new mapboxgl.LngLatBounds(coords[0],coords[0]));
+    flyoverMap.fitBounds(bounds,{padding:40,pitch:60,duration:1500});
+    document.getElementById('flyover-play-btn').disabled=false;
+    document.getElementById('flyover-status').textContent='Mapa pronto';
+  });
+  flyoverMap.on('error',function(e){
+    document.getElementById('flyover-status').textContent='Erro: verifique o token';
+    document.getElementById('flyover-token-wrap').style.display='flex';
+  });
+}
+
+var flyoverStep=0,flyoverTotal=0;
+function startFlyover(){
+  if(!flyoverMap||routePoints.length<2) return;
+  stopFlyover();
+  var coords=routePoints.map(function(p){return [p.lng,p.lat];});
+  flyoverTotal=coords.length; flyoverStep=0;
+  document.getElementById('flyover-play-btn').style.display='none';
+  document.getElementById('flyover-stop-btn').style.display='';
+  document.getElementById('flyover-status').textContent='Voando...';
+  function animStep(){
+    if(flyoverStep>=flyoverTotal){ stopFlyover(); return; }
+    var pt=coords[flyoverStep];
+    var nextPt=coords[Math.min(flyoverStep+1,flyoverTotal-1)];
+    var bearing=Math.atan2(nextPt[0]-pt[0],nextPt[1]-pt[1])*180/Math.PI;
+    flyoverMap.easeTo({center:pt,zoom:17,pitch:70,bearing:bearing,duration:300,easing:function(t){return t;}});
+    flyoverStep+=Math.max(1,Math.floor(flyoverTotal/120));
+    flyoverAnim=setTimeout(animStep,320);
+  }
+  animStep();
+}
+
+function stopFlyover(){
+  if(flyoverAnim){ clearTimeout(flyoverAnim); flyoverAnim=null; }
+  document.getElementById('flyover-play-btn').style.display='';
+  document.getElementById('flyover-stop-btn').style.display='none';
+  document.getElementById('flyover-status').textContent=flyoverStep>=flyoverTotal&&flyoverTotal>0?'Concluído':'';
 }
 
 function renderRouteMap(){
@@ -653,5 +832,6 @@ if('serviceWorker' in navigator){ window.addEventListener('load',function(){ nav
 renderBlocks(); updateSummary();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 </body>
 </html>
