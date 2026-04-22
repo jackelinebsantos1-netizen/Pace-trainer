@@ -430,6 +430,23 @@ function onGPS(pos){
   prevPos=pos; prevTime=now;
 }
 
+// ===== VOZ =====
+function falar(texto){
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(texto);
+  u.lang='pt-BR'; u.rate=1.05; u.pitch=1.0; u.volume=1.0;
+  var vozes=window.speechSynthesis.getVoices();
+  var voz=vozes.find(function(v){ return v.lang==='pt-BR'; })||
+           vozes.find(function(v){ return v.lang.startsWith('pt'); });
+  if(voz) u.voice=voz;
+  window.speechSynthesis.speak(u);
+}
+if(window.speechSynthesis){
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged=function(){ window.speechSynthesis.getVoices(); };
+}
+
 // ===== PACE MONITOR =====
 function updatePaceMonitor(secPerKm){
   if(!running) return;
@@ -442,17 +459,37 @@ function updatePaceMonitor(secPerKm){
   var nowSec=Date.now()/1000;
   document.getElementById('pm-live').textContent=livePace+' /km';
   document.getElementById('pm-target').textContent='Alvo: '+block.pace+' /km';
+
+  var novoStatus;
   if(Math.abs(diff)<=12){
+    novoStatus='ok';
     mon.className='pace-monitor ok';
     document.getElementById('pm-status').textContent='✓ No ritmo certo!';
   } else if(diff>0){
+    novoStatus='slow';
     mon.className='pace-monitor slow';
     document.getElementById('pm-status').textContent='▲ '+secToPace(Math.abs(diff))+' mais lento';
-    if(nowSec-lastPaceAlertSec>20){ lastPaceAlertSec=nowSec; playPaceSlow(); addLog('▲ Ritmo '+livePace+'/km — alvo '+block.pace+'/km (mais lento)','pace'); }
   } else {
+    novoStatus='fast';
     mon.className='pace-monitor fast';
     document.getElementById('pm-status').textContent='▼ '+secToPace(Math.abs(diff))+' mais rápido';
-    if(nowSec-lastPaceAlertSec>20){ lastPaceAlertSec=nowSec; playPaceFast(); addLog('▼ Ritmo '+livePace+'/km — alvo '+block.pace+'/km (mais rápido)','pace'); }
+  }
+
+  // alerta sonoro + VOZ a cada 20 segundos
+  if(nowSec-lastPaceAlertSec>=20){
+    lastPaceAlertSec=nowSec;
+    if(novoStatus==='slow'){
+      playPaceSlow();
+      falar('Acelera!');
+      addLog('🔊 "Acelera!" — ritmo '+livePace+'/km (alvo '+block.pace+'/km)','pace');
+    } else if(novoStatus==='fast'){
+      playPaceFast();
+      falar('Vamos diminuir!');
+      addLog('🔊 "Vamos diminuir!" — ritmo '+livePace+'/km (alvo '+block.pace+'/km)','pace');
+    } else {
+      falar('É só manter!');
+      addLog('🔊 "É só manter!" — ritmo '+livePace+'/km','start');
+    }
   }
 }
 
@@ -521,6 +558,7 @@ function startWorkout(){
   document.getElementById('sim-label').textContent='10:00/km';
   addLog('▶ Iniciando: '+blocks[0].label+' — alvo '+blocks[0].pace+'/km','start');
   playChange();
+  falar('Treino iniciado. '+blocks[0].label+'. Ritmo alvo: '+blocks[0].pace+' por quilômetro.');
   renderUpcoming(); updateRunUI();
   startGPSWatch();
   requestWakeLock();
@@ -547,17 +585,21 @@ function tick(){
   if(remaining===30&&!warningGiven){
     warningGiven=true; playWarning();
     var next=blocks[currentBlock+1];
+    falar('Atenção! Em 30 segundos: '+(next?next.label:'fim do treino'));
     addLog('⚠ 30s para mudar → '+(next?next.label:'FIM do treino'),'warning');
   }
   if(blockElapsed>=blockDur){
     var nextIdx=currentBlock+1;
     if(nextIdx>=blocks.length){
-      playEnd(); addLog('🏁 Treino concluído! Parabéns!','success');
+      playEnd();
+      falar('Treino concluído! Parabéns!');
+      addLog('🏁 Treino concluído! Parabéns!','success');
       running=false; clearInterval(intervalId); stopGPSWatch(); releaseWakeLock();
       updateRunUI(); return;
     } else {
       currentBlock=nextIdx; blockStart=now; blockElapsed=0; warningGiven=false; lastPaceAlertSec=0;
       playChange();
+      falar(blocks[nextIdx].label);
       addLog('🔄 '+blocks[nextIdx].label+' — alvo '+blocks[nextIdx].pace+'/km','change');
       renderUpcoming();
     }
