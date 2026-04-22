@@ -597,10 +597,7 @@ function stopWorkout(){
   running=false; clearInterval(intervalId);
   stopGPSWatch(); releaseWakeLock();
   addLog('⏹ Treino encerrado','stop');
-  setTimeout(function(){
-    document.getElementById('running-view').classList.remove('active');
-    document.getElementById('setup-view').style.display='';
-  },1000);
+  showFinish();
 }
 
 function tick(){
@@ -624,7 +621,7 @@ function tick(){
       addLog('🏁 Treino concluído! Parabéns!','success');
       running=false; clearInterval(intervalId); stopGPSWatch(); releaseWakeLock();
       updateRunUI();
-      showFinish();
+      showFinish(true);
       return;
     } else {
       currentBlock=nextIdx; blockStart=now; blockElapsed=0; warningGiven=false; lastPaceAlertSec=0;
@@ -690,7 +687,7 @@ if('serviceWorker' in navigator){
 }
 
 // ===== FINISH MODAL =====
-function showFinish(){
+function showFinish(completed){
   var distKm=totalDist/1000;
   var avgKmh=elapsed>0&&totalDist>0?((distKm)/(elapsed/3600)):0;
   var avgPaceSec=avgKmh>0?3600/avgKmh:0;
@@ -698,6 +695,8 @@ function showFinish(){
   document.getElementById('fin-time').textContent=fmt(elapsed);
   document.getElementById('fin-spd').textContent=avgKmh>0?avgKmh.toFixed(1)+' km/h':'--';
   document.getElementById('fin-pace').textContent=avgPaceSec>0?secToPace(avgPaceSec)+' /km':'--';
+  document.getElementById('finish-title').textContent=completed?'Treino Concluído!':'Treino Encerrado';
+  document.getElementById('finish-emoji').textContent=completed?'🏁':'⏹';
   var modal=document.getElementById('finish-modal');
   modal.style.display='flex';
   if(distKm>0){
@@ -715,8 +714,8 @@ renderBlocks(); updateSummary();
 </script>
 <!-- FINISH MODAL -->
 <div id="finish-modal" style="display:none;position:fixed;inset:0;background:rgba(11,13,15,0.97);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px;">
-  <div style="font-size:3.5rem;line-height:1;">🏁</div>
-  <div style="font-size:2rem;font-weight:900;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;text-align:center;">Treino Concluído!</div>
+  <div id="finish-emoji" style="font-size:3.5rem;line-height:1;">🏁</div>
+  <div id="finish-title" style="font-size:2rem;font-weight:900;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;text-align:center;">Treino Concluído!</div>
   <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;width:100%;max-width:400px;">
     <div class="finish-stat">
       <div class="finish-stat-val" id="fin-dist">--</div>
