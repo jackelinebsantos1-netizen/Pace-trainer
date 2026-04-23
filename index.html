@@ -181,7 +181,8 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .flyover-wrap{width:100%;max-width:420px;border-radius:12px;overflow:hidden;border:1px solid var(--border);display:none}
 #flyover-map{width:100%;height:260px}
 .flyover-controls{display:flex;gap:8px;padding:10px 12px;background:var(--surface);border-top:1px solid var(--border);align-items:center;flex-wrap:wrap}
-.flyover-btn{background:var(--accent);color:#000;border:none;border-radius:8px;padding:8px 16px;font-weight:700;font-size:.78rem;cursor:pointer;transition:opacity .2s}
+.flyover-btn{background:#ff8c00;color:#000;border:none;border-radius:8px;padding:8px 18px;font-weight:700;font-size:.78rem;cursor:pointer;transition:opacity .2s}
+.flyover-btn:active{opacity:.8}
 .flyover-btn:disabled{opacity:.35;cursor:default}
 .flyover-btn.stop{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
 .flyover-token-wrap{display:flex;flex-direction:column;gap:4px;width:100%;margin-top:4px;padding:0 12px 10px;background:var(--surface)}
@@ -250,10 +251,13 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 
   <div class="flyover-wrap" id="flyover-wrap" style="width:100%;max-width:480px">
     <div id="flyover-map" style="width:100%;height:280px;background:var(--surface2)"></div>
+    <div style="background:var(--surface2);height:3px;width:100%">
+      <div id="flyover-prog" style="height:100%;background:linear-gradient(90deg,#ff6a00,#ff8c00);width:0%;transition:width 0.15s linear"></div>
+    </div>
     <div class="flyover-controls">
-      <button class="flyover-btn" id="flyover-play-btn" onclick="startFlyover()">▶ Flyover 3D</button>
+      <button class="flyover-btn" id="flyover-play-btn" onclick="startFlyover()" disabled>▶ Voar</button>
       <button class="flyover-btn stop" id="flyover-stop-btn" onclick="stopFlyover()" style="display:none">⏹ Parar</button>
-      <span class="flyover-status" id="flyover-status"></span>
+      <span class="flyover-status" id="flyover-status">Carregando mapa...</span>
     </div>
     <div class="flyover-token-wrap" id="flyover-token-wrap">
       <label>Token Mapbox (gratuito em mapbox.com)</label>
@@ -743,99 +747,177 @@ function initMapboxMap(){
   if(!mapboxToken||routePoints.length<2) return;
   if(flyoverMap){ flyoverMap.remove(); flyoverMap=null; }
   mapboxgl.accessToken=mapboxToken;
+
   var coords=routePoints.map(function(p){return [p.lng,p.lat];});
   var center=coords[0];
+
   flyoverMap=new mapboxgl.Map({
     container:'flyover-map',
     style:'mapbox://styles/mapbox/satellite-streets-v12',
-    center:center, zoom:15, pitch:60, bearing:0,
+    center:center,
+    zoom:16,
+    pitch:75,
+    bearing:0,
     antialias:true
   });
+
   flyoverMap.on('load',function(){
-    flyoverMap.addSource('terrain',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512,maxzoom:14});
-    flyoverMap.setTerrain({source:'terrain',exaggeration:1.5});
-    flyoverMap.addSource('route',{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:coords}}});
-    flyoverMap.addLayer({id:'route-line',type:'line',source:'route',layout:{'line-join':'round','line-cap':'round'},paint:{'line-color':'#e8ff47','line-width':4,'line-opacity':0.9}});
-    // start/end markers
-    new mapboxgl.Marker({color:'#47ff8a'}).setLngLat(coords[0]).addTo(flyoverMap);
-    new mapboxgl.Marker({color:'#ff4747'}).setLngLat(coords[coords.length-1]).addTo(flyoverMap);
-    // fit to route
-    var bounds=coords.reduce(function(b,c){return b.extend(c);},new mapboxgl.LngLatBounds(coords[0],coords[0]));
-    flyoverMap.fitBounds(bounds,{padding:40,pitch:60,duration:1500});
+
+    // ── Terreno 3D ──
+    flyoverMap.addSource('mapbox-dem',{
+      type:'raster-dem',
+      url:'mapbox://mapbox.mapbox-terrain-dem-v1',
+      tileSize:512, maxzoom:14
+    });
+    flyoverMap.setTerrain({source:'mapbox-dem', exaggeration:1.8});
+    flyoverMap.setFog({
+      range:[0.5,10],
+      color:'rgba(10,10,20,0.6)',
+      'horizon-blend':0.08
+    });
+
+    // ── Sombra do trajeto (buffer cinza) ──
+    flyoverMap.addSource('route-shadow',{type:'geojson', data:{
+      type:'Feature', geometry:{type:'LineString', coordinates:coords}
+    }});
+    flyoverMap.addLayer({
+      id:'route-shadow', type:'line', source:'route-shadow',
+      layout:{'line-join':'round','line-cap':'round'},
+      paint:{'line-color':'#000','line-width':10,'line-opacity':0.35,'line-blur':4}
+    });
+
+    // ── Trilha completa (cinza) ──
+    flyoverMap.addSource('route-full',{type:'geojson', data:{
+      type:'Feature', geometry:{type:'LineString', coordinates:coords}
+    }});
+    flyoverMap.addLayer({
+      id:'route-full', type:'line', source:'route-full',
+      layout:{'line-join':'round','line-cap':'round'},
+      paint:{'line-color':'rgba(255,255,255,0.2)','line-width':3}
+    });
+
+    // ── Trilha animada (LARANJA) — começa vazia ──
+    flyoverMap.addSource('route-live',{type:'geojson', data:{
+      type:'Feature', geometry:{type:'LineString', coordinates:[coords[0]]}
+    }});
+    flyoverMap.addLayer({
+      id:'route-live-glow', type:'line', source:'route-live',
+      layout:{'line-join':'round','line-cap':'round'},
+      paint:{'line-color':'#ff6a00','line-width':10,'line-opacity':0.35,'line-blur':6}
+    });
+    flyoverMap.addLayer({
+      id:'route-live', type:'line', source:'route-live',
+      layout:{'line-join':'round','line-cap':'round'},
+      paint:{'line-color':'#ff8c00','line-width':5,'line-opacity':1}
+    });
+
+    // ── Marcador de início (verde) ──
+    var startEl=document.createElement('div');
+    startEl.style.cssText='width:14px;height:14px;border-radius:50%;background:#47ff8a;border:3px solid #fff;box-shadow:0 0 10px #47ff8a';
+    new mapboxgl.Marker({element:startEl}).setLngLat(coords[0]).addTo(flyoverMap);
+
+    // ── Cursor (corredor) animado ──
+    var dotEl=document.createElement('div');
+    dotEl.id='flyover-dot';
+    dotEl.style.cssText='width:16px;height:16px;border-radius:50%;background:#ff8c00;border:3px solid #fff;box-shadow:0 0 14px #ff8c00;transition:none';
+    flyoverDotMarker=new mapboxgl.Marker({element:dotEl}).setLngLat(coords[0]).addTo(flyoverMap);
+
+    // fit overview primeiro
+    var bounds=coords.reduce(function(b,pt){return b.extend(pt);},new mapboxgl.LngLatBounds(coords[0],coords[0]));
+    flyoverMap.fitBounds(bounds,{padding:60,pitch:60,duration:2000});
+
     document.getElementById('flyover-play-btn').disabled=false;
-    document.getElementById('flyover-status').textContent='Mapa pronto';
+    document.getElementById('flyover-status').textContent='Pronto — toque em Voar';
   });
-  flyoverMap.on('error',function(e){
-    document.getElementById('flyover-status').textContent='Erro: verifique o token';
+
+  flyoverMap.on('error',function(){
+    document.getElementById('flyover-status').textContent='Erro: token inválido';
     document.getElementById('flyover-token-wrap').style.display='flex';
   });
 }
 
-var flyoverStep=0,flyoverTotal=0;
+var flyoverStep=0, flyoverAnimId=null, flyoverDotMarker=null;
+var FLYOVER_SPEED=150; // ms entre frames (ajustável)
+
+function computeBearing(a,b){
+  var dLng=(b[0]-a[0])*Math.PI/180;
+  var lat1=a[1]*Math.PI/180, lat2=b[1]*Math.PI/180;
+  var y=Math.sin(dLng)*Math.cos(lat2);
+  var x=Math.cos(lat1)*Math.sin(lat2)-Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLng);
+  return (Math.atan2(y,x)*180/Math.PI+360)%360;
+}
+
 function startFlyover(){
   if(!flyoverMap||routePoints.length<2) return;
   stopFlyover();
+
   var coords=routePoints.map(function(p){return [p.lng,p.lat];});
-  flyoverTotal=coords.length; flyoverStep=0;
+  flyoverStep=0;
+
+  // reset trilha animada
+  flyoverMap.getSource('route-live').setData({type:'Feature',geometry:{type:'LineString',coordinates:[coords[0]]}});
+  if(flyoverDotMarker) flyoverDotMarker.setLngLat(coords[0]);
+
   document.getElementById('flyover-play-btn').style.display='none';
   document.getElementById('flyover-stop-btn').style.display='';
   document.getElementById('flyover-status').textContent='Voando...';
-  function animStep(){
-    if(flyoverStep>=flyoverTotal){ stopFlyover(); return; }
-    var pt=coords[flyoverStep];
-    var nextPt=coords[Math.min(flyoverStep+1,flyoverTotal-1)];
-    var bearing=Math.atan2(nextPt[0]-pt[0],nextPt[1]-pt[1])*180/Math.PI;
-    flyoverMap.easeTo({center:pt,zoom:17,pitch:70,bearing:bearing,duration:300,easing:function(t){return t;}});
-    flyoverStep+=Math.max(1,Math.floor(flyoverTotal/120));
-    flyoverAnim=setTimeout(animStep,320);
+
+  // progress bar
+  var progBar=document.getElementById('flyover-prog');
+  if(progBar) progBar.style.width='0%';
+
+  function frame(){
+    if(flyoverStep>=coords.length-1){
+      // chegou ao fim — mostrar marcador final
+      var endEl=document.createElement('div');
+      endEl.style.cssText='width:14px;height:14px;border-radius:50%;background:#ff4747;border:3px solid #fff;box-shadow:0 0 10px #ff4747';
+      new mapboxgl.Marker({element:endEl}).setLngLat(coords[coords.length-1]).addTo(flyoverMap);
+      stopFlyover(true);
+      return;
+    }
+
+    var cur=coords[flyoverStep];
+    var next=coords[Math.min(flyoverStep+1, coords.length-1)];
+    var bearing=computeBearing(cur,next);
+    var pct=Math.round((flyoverStep/(coords.length-1))*100);
+
+    // atualiza trilha laranja até ponto atual
+    var drawn=coords.slice(0, flyoverStep+1);
+    flyoverMap.getSource('route-live').setData({type:'Feature',geometry:{type:'LineString',coordinates:drawn}});
+
+    // move cursor laranja
+    if(flyoverDotMarker) flyoverDotMarker.setLngLat(cur);
+
+    // progresso
+    if(progBar) progBar.style.width=pct+'%';
+    document.getElementById('flyover-status').textContent=pct+'% voado';
+
+    // câmera voa junto com o corredor
+    flyoverMap.easeTo({
+      center:cur,
+      zoom:17.5,
+      pitch:72,
+      bearing:bearing,
+      duration:FLYOVER_SPEED,
+      easing:function(t){return t;}
+    });
+
+    // pular frames proporcionalmente para duração ~40s
+    var skip=Math.max(1, Math.floor(coords.length/200));
+    flyoverStep+=skip;
+    flyoverAnimId=setTimeout(frame, FLYOVER_SPEED);
   }
-  animStep();
+
+  frame();
 }
 
-function stopFlyover(){
-  if(flyoverAnim){ clearTimeout(flyoverAnim); flyoverAnim=null; }
+function stopFlyover(finished){
+  if(flyoverAnimId){ clearTimeout(flyoverAnimId); flyoverAnimId=null; }
   document.getElementById('flyover-play-btn').style.display='';
   document.getElementById('flyover-stop-btn').style.display='none';
-  document.getElementById('flyover-status').textContent=flyoverStep>=flyoverTotal&&flyoverTotal>0?'Concluído':'';
-}
-
-function renderRouteMap(){
-  var wrap=document.getElementById('finish-map-wrap');
-  if(routePoints.length<2){ wrap.style.display='none'; return; }
-  wrap.style.display='block';
-
-  // destroy previous map instance if any
-  if(finishMap){ finishMap.remove(); finishMap=null; finishPolyline=null; }
-
-  var latlngs=routePoints.map(function(p){return [p.lat,p.lng];});
-
-  finishMap=L.map('finish-map',{
-    zoomControl:true,
-    attributionControl:false,
-    dragging:true,
-    scrollWheelZoom:false
-  });
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    maxZoom:19
-  }).addTo(finishMap);
-
-  // draw route
-  finishPolyline=L.polyline(latlngs,{
-    color:'#e8ff47',
-    weight:4,
-    opacity:0.9,
-    lineJoin:'round',
-    lineCap:'round'
-  }).addTo(finishMap);
-
-  // start marker (green dot)
-  L.circleMarker(latlngs[0],{radius:7,fillColor:'#47ff8a',color:'#0b0d0f',weight:2,fillOpacity:1}).addTo(finishMap);
-  // end marker (red dot)
-  L.circleMarker(latlngs[latlngs.length-1],{radius:7,fillColor:'#ff4747',color:'#0b0d0f',weight:2,fillOpacity:1}).addTo(finishMap);
-
-  finishMap.fitBounds(finishPolyline.getBounds(),{padding:[16,16]});
-  finishMap.invalidateSize();
+  document.getElementById('flyover-status').textContent=finished?'✓ Percurso completo':'';
+  var progBar=document.getElementById('flyover-prog');
+  if(progBar&&finished) progBar.style.width='100%';
 }
 
 function closeFinish(){
