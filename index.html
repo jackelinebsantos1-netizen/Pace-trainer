@@ -193,7 +193,69 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .flyover-token-save{background:var(--accent);color:#000;border:none;border-radius:6px;padding:7px 12px;font-weight:700;font-size:.75rem;cursor:pointer;white-space:nowrap}
 .flyover-status{font-family:"Courier New",monospace;font-size:.65rem;color:var(--muted);margin-left:auto}
 
-@media(max-width:420px){@media(max-width:420px){
+/* SHARE CARDS */
+.share-card-wrap { position:relative; cursor:pointer; border-radius:16px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,.6); transition:transform .15s; }
+.share-card-wrap:active { transform:scale(0.97); }
+.share-card-label { font-family:"Courier New",monospace; font-size:.62rem; color:var(--muted); text-transform:uppercase; letter-spacing:.15em; margin-bottom:6px; }
+.share-card-download { position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,.6); color:#fff; border:none; border-radius:8px; padding:6px 12px; font-size:.72rem; font-weight:700; cursor:pointer; backdrop-filter:blur(4px); }
+
+.hstat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.hstat-val{font-size:1.5rem;font-weight:900;color:var(--accent);line-height:1;margin-bottom:4px;font-family:"Courier New",monospace}
+.hstat-lbl{font-family:"Courier New",monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.hist-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.hist-section-title{font-family:"Courier New",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);margin-bottom:12px}
+.act-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;transition:background .15s}
+.act-item:last-child{border-bottom:none}
+.act-item:active{background:rgba(255,255,255,.03)}
+.act-date{font-family:"Courier New",monospace;font-size:.65rem;color:var(--muted);min-width:72px}
+.act-info{flex:1}
+.act-name{font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.act-meta{font-family:"Courier New",monospace;font-size:.7rem;color:var(--muted)}
+.act-dist{font-family:"Courier New",monospace;font-size:1rem;font-weight:900;color:var(--accent2);text-align:right}
+.act-effort{width:8px;border-radius:4px;flex-shrink:0;align-self:stretch}
+.pr-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.pr-item:last-child{border-bottom:none}
+.pr-lbl{font-size:.82rem;color:var(--text)}
+.pr-val{font-family:"Courier New",monospace;font-size:.9rem;font-weight:700;color:var(--accent)}
+.week-bar{flex:1;background:var(--accent2);border-radius:3px 3px 0 0;min-height:4px;transition:height .4s ease;cursor:pointer;position:relative}
+.week-bar.current{background:var(--accent)}
+.week-lbl{flex:1;font-family:"Courier New",monospace;font-size:.52rem;color:var(--muted);text-align:center}
+.effort-pill{display:inline-block;padding:4px 12px;border-radius:20px;font-family:"Courier New",monospace;font-size:.72rem;font-weight:700;margin-left:8px}
+.effort-up{background:rgba(255,71,71,.15);color:#ff4747}
+.effort-down{background:rgba(71,255,138,.15);color:#47ff8a}
+.effort-same{background:rgba(255,255,255,.1);color:var(--muted)}
+@media(max-width:420px){/* SHARE CARDS */
+.share-card-wrap { position:relative; cursor:pointer; border-radius:16px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,.6); transition:transform .15s; }
+.share-card-wrap:active { transform:scale(0.97); }
+.share-card-label { font-family:"Courier New",monospace; font-size:.62rem; color:var(--muted); text-transform:uppercase; letter-spacing:.15em; margin-bottom:6px; }
+.share-card-download { position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,.6); color:#fff; border:none; border-radius:8px; padding:6px 12px; font-size:.72rem; font-weight:700; cursor:pointer; backdrop-filter:blur(4px); }
+
+.hstat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.hstat-val{font-size:1.5rem;font-weight:900;color:var(--accent);line-height:1;margin-bottom:4px;font-family:"Courier New",monospace}
+.hstat-lbl{font-family:"Courier New",monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.hist-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.hist-section-title{font-family:"Courier New",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);margin-bottom:12px}
+.act-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;transition:background .15s}
+.act-item:last-child{border-bottom:none}
+.act-item:active{background:rgba(255,255,255,.03)}
+.act-date{font-family:"Courier New",monospace;font-size:.65rem;color:var(--muted);min-width:72px}
+.act-info{flex:1}
+.act-name{font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.act-meta{font-family:"Courier New",monospace;font-size:.7rem;color:var(--muted)}
+.act-dist{font-family:"Courier New",monospace;font-size:1rem;font-weight:900;color:var(--accent2);text-align:right}
+.act-effort{width:8px;border-radius:4px;flex-shrink:0;align-self:stretch}
+.pr-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.pr-item:last-child{border-bottom:none}
+.pr-lbl{font-size:.82rem;color:var(--text)}
+.pr-val{font-family:"Courier New",monospace;font-size:.9rem;font-weight:700;color:var(--accent)}
+.week-bar{flex:1;background:var(--accent2);border-radius:3px 3px 0 0;min-height:4px;transition:height .4s ease;cursor:pointer;position:relative}
+.week-bar.current{background:var(--accent)}
+.week-lbl{flex:1;font-family:"Courier New",monospace;font-size:.52rem;color:var(--muted);text-align:center}
+.effort-pill{display:inline-block;padding:4px 12px;border-radius:20px;font-family:"Courier New",monospace;font-size:.72rem;font-weight:700;margin-left:8px}
+.effort-up{background:rgba(255,71,71,.15);color:#ff4747}
+.effort-down{background:rgba(71,255,138,.15);color:#47ff8a}
+.effort-same{background:rgba(255,255,255,.1);color:var(--muted)}
+@media(max-width:420px){
   .block-row{grid-template-columns:18px 1fr 56px 74px 60px 24px;gap:4px;padding:8px}
   .run-elapsed{font-size:2.2rem}
   .cb-name{font-size:1.2rem}
@@ -269,6 +331,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
   </div>
 
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px">
+    <button onclick="openShareModal()" style="background:#ff8c00;color:#000;border:none;border-radius:12px;padding:16px 28px;font-weight:900;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%">📸 Gerar Cards</button>
     <button id="finish-new-btn" style="background:var(--accent);color:#000;border:none;border-radius:12px;padding:16px 28px;font-weight:900;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">▶ Novo Treino</button>
     <button id="finish-exit-btn" style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:16px 28px;font-weight:700;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">✕ Sair</button>
   </div>
@@ -278,6 +341,10 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 <div class="app" id="setup-view">
   <h1>Pace Trainer</h1>
   <div class="subtitle">Controle de ritmo para corrida</div>
+  <button onclick="showView('history')" style="display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;margin-bottom:16px;color:var(--text)">
+    <span style="font-weight:700;font-size:.9rem">📊 Histórico &amp; Estatísticas</span>
+    <span style="font-family:'Courier New',monospace;font-size:.7rem;color:var(--muted)" id="nav-hist-summary">Carregando...</span>
+  </button>
   <div class="gps-banner">
     <div class="gps-dot" id="setup-gps-dot"></div>
     <div class="gps-text">
@@ -303,6 +370,51 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
     4. Monitor fala: <strong style="color:var(--green)">"É só manter"</strong> · <strong style="color:var(--orange)">"Acelera!"</strong> · <strong style="color:var(--accent2)">"Vamos diminuir!"</strong> a cada 20s.<br>
     5. Sem GPS? Use o <strong>simulador de ritmo</strong> (slider) durante o treino.
   </div>
+</div>
+
+<!-- HISTORY VIEW -->
+<div id="history-view" style="display:none;max-width:700px;margin:0 auto;padding:20px 16px 100px">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+    <button onclick="showView('setup')" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:.85rem">← Voltar</button>
+    <h1 style="font-size:1.8rem">Histórico</h1>
+  </div>
+
+  <!-- STATS CARDS -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px" id="hist-stats-grid">
+    <div class="hstat-card"><div class="hstat-val" id="hs-total-km">0 km</div><div class="hstat-lbl">Total acumulado</div></div>
+    <div class="hstat-card"><div class="hstat-val" id="hs-count">0</div><div class="hstat-lbl">Atividades</div></div>
+    <div class="hstat-card"><div class="hstat-val" id="hs-best-pace">--</div><div class="hstat-lbl">🏆 Melhor ritmo/km</div></div>
+    <div class="hstat-card"><div class="hstat-val" id="hs-longest">--</div><div class="hstat-lbl">🏆 Maior distância</div></div>
+    <div class="hstat-card" style="grid-column:span 2"><div class="hstat-val" id="hs-effort">--</div><div class="hstat-lbl">Esforço relativo (últimas 4 semanas vs anteriores)</div></div>
+  </div>
+
+  <!-- WEEKLY CHART -->
+  <div class="hist-section">
+    <div class="hist-section-title">Quilometragem semanal</div>
+    <div id="weekly-chart" style="display:flex;align-items:flex-end;gap:6px;height:100px;padding:0 4px"></div>
+    <div id="weekly-labels" style="display:flex;gap:6px;margin-top:4px;padding:0 4px"></div>
+  </div>
+
+  <!-- PR LIST -->
+  <div class="hist-section" id="pr-section" style="display:none">
+    <div class="hist-section-title">Recordes pessoais 🏆</div>
+    <div id="pr-list"></div>
+  </div>
+
+  <!-- ACTIVITY LIST -->
+  <div class="hist-section">
+    <div class="hist-section-title">Todas as atividades</div>
+    <div id="activity-list"></div>
+  </div>
+</div>
+
+<!-- ACTIVITY DETAIL VIEW -->
+<div id="detail-view" style="display:none;max-width:700px;margin:0 auto;padding:20px 16px 100px">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+    <button onclick="showView('history')" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:.85rem">← Voltar</button>
+    <h1 style="font-size:1.5rem" id="detail-title">Atividade</h1>
+  </div>
+  <div id="detail-content"></div>
 </div>
 
 <!-- RUNNING VIEW -->
@@ -678,6 +790,7 @@ function showFinish(completed){
   }
   document.getElementById('finish-modal').style.display='flex';
   if(distKm>0) falar('Distância percorrida: '+distKm.toFixed(2)+' quilômetros. Velocidade média: '+avgKmh.toFixed(1)+' quilômetros por hora.');
+  saveCurrentActivity(completed);
   setTimeout(function(){ renderRouteMap(); renderSplits(); initFlyover(); }, 120);
 }
 
@@ -920,6 +1033,358 @@ function stopFlyover(finished){
   if(progBar&&finished) progBar.style.width='100%';
 }
 
+// ══════════════════════════════════════════
+// SHARE CARDS GENERATOR
+// ══════════════════════════════════════════
+
+function openShareModal(){
+  document.getElementById('share-modal').style.display='flex';
+  setTimeout(generateAllCards, 80);
+}
+
+function closeShareModal(){
+  document.getElementById('share-modal').style.display='none';
+}
+
+// Draw route on a canvas (returns canvas)
+function drawRouteCanvas(w, h, bgColor, lineColor, lineWidth){
+  var cv=document.createElement('canvas');
+  cv.width=w; cv.height=h;
+  var ctx=cv.getContext('2d');
+
+  // background
+  ctx.fillStyle=bgColor;
+  ctx.fillRect(0,0,w,h);
+
+  if(routePoints.length<2) return cv;
+
+  // project lat/lng to canvas coords
+  var lats=routePoints.map(function(p){return p.lat;});
+  var lngs=routePoints.map(function(p){return p.lng;});
+  var minLat=Math.min.apply(null,lats), maxLat=Math.max.apply(null,lats);
+  var minLng=Math.min.apply(null,lngs), maxLng=Math.max.apply(null,lngs);
+  var pad=Math.min(w,h)*0.12;
+  var ranLat=maxLat-minLat||0.001, ranLng=maxLng-minLng||0.001;
+  var scaleX=(w-pad*2)/ranLng, scaleY=(h-pad*2)/ranLat;
+  var scale=Math.min(scaleX,scaleY);
+  var offX=(w-(ranLng*scale))/2, offY=(h-(ranLat*scale))/2;
+
+  function proj(p){
+    return {
+      x: offX+(p.lng-minLng)*scale,
+      y: h-offY-(p.lat-minLat)*scale
+    };
+  }
+
+  // shadow
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.5)';
+  ctx.shadowBlur=8;
+  ctx.beginPath();
+  var p0=proj(routePoints[0]);
+  ctx.moveTo(p0.x, p0.y);
+  routePoints.forEach(function(p){ var pp=proj(p); ctx.lineTo(pp.x,pp.y); });
+  ctx.strokeStyle=lineColor;
+  ctx.lineWidth=lineWidth+3;
+  ctx.lineCap='round';
+  ctx.lineJoin='round';
+  ctx.globalAlpha=0.3;
+  ctx.stroke();
+  ctx.restore();
+
+  // main line
+  ctx.beginPath();
+  ctx.moveTo(p0.x, p0.y);
+  routePoints.forEach(function(p){ var pp=proj(p); ctx.lineTo(pp.x,pp.y); });
+  ctx.strokeStyle=lineColor;
+  ctx.lineWidth=lineWidth;
+  ctx.lineCap='round';
+  ctx.lineJoin='round';
+  ctx.globalAlpha=1;
+  ctx.stroke();
+
+  // start dot
+  var ps=proj(routePoints[0]);
+  ctx.beginPath(); ctx.arc(ps.x,ps.y,lineWidth*1.4,0,Math.PI*2);
+  ctx.fillStyle='#47ff8a'; ctx.fill();
+
+  // end dot
+  var pe=proj(routePoints[routePoints.length-1]);
+  ctx.beginPath(); ctx.arc(pe.x,pe.y,lineWidth*1.4,0,Math.PI*2);
+  ctx.fillStyle='#ff4747'; ctx.fill();
+
+  return cv;
+}
+
+function fmtElapsed(sec){
+  var m=Math.floor(sec/60), s=sec%60;
+  return m+'min '+(s<10?'0':'')+s+'s';
+}
+
+function getStats(){
+  var distKm=totalDist/1000;
+  var avgKmh=(elapsed>0&&distKm>0)?(distKm/(elapsed/3600)):0;
+  var avgPaceSec=avgKmh>0?3600/avgKmh:0;
+  return {
+    dist: distKm>0?distKm.toFixed(2)+' km':'--',
+    pace: avgPaceSec>0?secToPace(avgPaceSec)+' /km':'--',
+    time: fmtElapsed(elapsed),
+    kcal: distKm>0?Math.round(distKm*70*0.95)+'kcal':'--',  // ~70kcal/km estimate
+    distKm: distKm,
+    avgPaceSec: avgPaceSec,
+    avgKmh: avgKmh
+  };
+}
+
+function downloadCanvas(cv, name){
+  var a=document.createElement('a');
+  a.download=name||'pace-trainer-card.png';
+  a.href=cv.toDataURL('image/png');
+  a.click();
+}
+
+function generateAllCards(){
+  var container=document.getElementById('share-cards-container');
+  container.innerHTML='';
+  var stats=getStats();
+  var cards=[
+    {label:'Card 1 — Mapa grande', fn:function(){ return cardMapFull(stats); }},
+    {label:'Card 2 — Dados + Mapa', fn:function(){ return cardDataMap(stats); }},
+    {label:'Card 3 — Minimalista', fn:function(){ return cardMinimal(stats); }},
+    {label:'Card 4 — Vertical grande', fn:function(){ return cardVertical(stats); }},
+  ];
+
+  cards.forEach(function(card, i){
+    var cv=card.fn();
+    var wrap=document.createElement('div');
+    wrap.className='share-card-wrap';
+    wrap.style.width='100%';
+
+    var lbl=document.createElement('div');
+    lbl.className='share-card-label';
+    lbl.textContent=card.label;
+    container.appendChild(lbl);
+
+    // display canvas scaled
+    var display=document.createElement('canvas');
+    var maxW=Math.min(container.offsetWidth||360, 480);
+    var scale=maxW/cv.width;
+    display.width=maxW;
+    display.height=cv.height*scale;
+    display.style.width='100%';
+    display.style.borderRadius='16px';
+    display.style.display='block';
+    var dCtx=display.getContext('2d');
+    dCtx.drawImage(cv,0,0,display.width,display.height);
+
+    display.onclick=function(){ downloadCanvas(cv,'pace-trainer-card-'+(i+1)+'.png'); };
+
+    var hint=document.createElement('div');
+    hint.style.cssText='font-family:"Courier New",monospace;font-size:.6rem;color:var(--muted);text-align:center;margin-top:4px;margin-bottom:4px';
+    hint.textContent='⬇ Toque para baixar';
+
+    wrap.appendChild(display);
+    container.appendChild(wrap);
+    container.appendChild(hint);
+  });
+}
+
+// ── CARD 1: Mapa grande com dados embaixo ──
+function cardMapFull(s){
+  var W=1080, H=1350;
+  var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  var ctx=cv.getContext('2d');
+
+  // bg
+  var grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'#0f1115'); grad.addColorStop(1,'#1a1d24');
+  ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+
+  // route map area
+  var mapH=H*0.58;
+  var routeCV=drawRouteCanvas(W, mapH, 'transparent', '#ff8c00', 7);
+  ctx.drawImage(routeCV,0,0);
+
+  // separator line
+  ctx.fillStyle='rgba(255,140,0,0.3)'; ctx.fillRect(60,mapH+10,W-120,1);
+
+  // icon shoe (simple SVG-like)
+  ctx.fillStyle='#fff';
+  ctx.font='bold 52px system-ui';
+  ctx.textAlign='center';
+  ctx.fillText('🏃', W/2, mapH+80);
+
+  // APP name
+  ctx.fillStyle='rgba(255,255,255,0.9)';
+  ctx.font='bold 52px system-ui,-apple-system,sans-serif';
+  ctx.letterSpacing='8px';
+  ctx.textAlign='center';
+  ctx.fillText('PACE TRAINER', W/2, mapH+145);
+
+  // stats row
+  var cols=[
+    {lbl:'Distância', val:s.dist},
+    {lbl:'Ritmo', val:s.pace},
+    {lbl:'Tempo', val:s.time},
+  ];
+  var colW=W/3;
+  cols.forEach(function(col,i){
+    var x=colW*i+colW/2;
+    ctx.fillStyle='rgba(255,255,255,0.5)';
+    ctx.font='500 34px system-ui';
+    ctx.textAlign='center';
+    ctx.fillText(col.lbl, x, mapH+230);
+    ctx.fillStyle='#ffffff';
+    ctx.font='bold 58px system-ui';
+    ctx.fillText(col.val, x, mapH+300);
+  });
+
+  // dividers
+  ctx.fillStyle='rgba(255,255,255,0.15)';
+  ctx.fillRect(colW,mapH+200,1,120);
+  ctx.fillRect(colW*2,mapH+200,1,120);
+
+  return cv;
+}
+
+// ── CARD 2: Dados em cima + mapa embaixo ──
+function cardDataMap(s){
+  var W=1080, H=1080;
+  var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  var ctx=cv.getContext('2d');
+
+  // bg xadrez estilo strava
+  ctx.fillStyle='#1e2028'; ctx.fillRect(0,0,W,H);
+  var sz=48;
+  for(var y=0;y<H;y+=sz) for(var x=0;x<W;x+=sz){
+    if((Math.floor(x/sz)+Math.floor(y/sz))%2===0){
+      ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fillRect(x,y,sz,sz);
+    }
+  }
+
+  // top section dados
+  var topH=420;
+  ctx.fillStyle='rgba(255,140,0,0.12)'; ctx.fillRect(0,0,W,topH);
+
+  // shoe icon + app
+  ctx.font='60px system-ui'; ctx.textAlign='left'; ctx.fillText('🏃',60,90);
+  ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='bold 58px system-ui';
+  ctx.fillText('PACE TRAINER',150,90);
+
+  // 6 stats grid
+  var stats2=[
+    {lbl:'Distância',val:s.dist},
+    {lbl:'Ritmo',val:s.pace},
+    {lbl:'Cal',val:s.kcal},
+    {lbl:'Tempo',val:s.time},
+    {lbl:'Vel. média',val:s.avgKmh>0?s.avgKmh.toFixed(1)+' km/h':'--'},
+    {lbl:'Parciais',val:kmSplits.length>0?kmSplits.length+' km':'--'},
+  ];
+  stats2.forEach(function(st,i){
+    var col=i%3, row=Math.floor(i/3);
+    var x=60+col*(W/3), y=160+row*120;
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='34px system-ui'; ctx.textAlign='left';
+    ctx.fillText(st.lbl,x,y);
+    ctx.fillStyle='#ffffff'; ctx.font='bold 62px system-ui';
+    ctx.fillText(st.val,x,y+72);
+  });
+
+  // map section
+  var mapY=topH+20, mapH=H-mapY-20;
+  var routeCV=drawRouteCanvas(W-80, mapH, 'transparent','#ff8c00',8);
+  ctx.drawImage(routeCV,40,mapY);
+
+  return cv;
+}
+
+// ── CARD 3: Minimalista horizontal ──
+function cardMinimal(s){
+  var W=1080, H=540;
+  var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  var ctx=cv.getContext('2d');
+
+  // dark bg
+  var grad=ctx.createLinearGradient(0,0,W,H);
+  grad.addColorStop(0,'#111316'); grad.addColorStop(1,'#1c1f27');
+  ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+
+  // left: route
+  var mapW=W*0.42;
+  var routeCV=drawRouteCanvas(mapW,H,'transparent','#ff8c00',6);
+  ctx.drawImage(routeCV,0,0);
+
+  // right: stats
+  var rx=mapW+60;
+  ctx.fillStyle='rgba(255,255,255,0.9)';
+  ctx.font='bold 42px system-ui'; ctx.textAlign='left';
+  ctx.fillText('🏃 PACE TRAINER',rx,70);
+
+  ctx.fillStyle='rgba(255,140,0,0.6)'; ctx.fillRect(rx,90,W-rx-60,2);
+
+  var rows=[
+    {lbl:'Distância',val:s.dist},
+    {lbl:'Ritmo',val:s.pace},
+    {lbl:'Tempo',val:s.time},
+  ];
+  rows.forEach(function(r,i){
+    var y=160+i*120;
+    ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.font='30px system-ui';
+    ctx.fillText(r.lbl,rx,y);
+    ctx.fillStyle='#ffffff'; ctx.font='bold 60px system-ui';
+    ctx.fillText(r.val,rx,y+68);
+  });
+
+  return cv;
+}
+
+// ── CARD 4: Vertical grande estilo story ──
+function cardVertical(s){
+  var W=1080, H=1920;
+  var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  var ctx=cv.getContext('2d');
+
+  // bg gradient
+  var grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'#0d0f12'); grad.addColorStop(0.5,'#1a1d24'); grad.addColorStop(1,'#0d0f12');
+  ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+
+  // top bar laranja
+  ctx.fillStyle='#ff8c00'; ctx.fillRect(0,0,W,8);
+
+  // title
+  ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='bold 72px system-ui'; ctx.textAlign='center';
+  ctx.fillText('🏃 PACE TRAINER',W/2,120);
+
+  // big stats
+  var bigStats=[
+    {lbl:'Distância',val:s.dist,size:130},
+    {lbl:'Ritmo',val:s.pace,size:100},
+    {lbl:'Tempo',val:s.time,size:100},
+  ];
+  var statY=200;
+  bigStats.forEach(function(st){
+    statY+=80;
+    ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='44px system-ui';
+    ctx.fillText(st.lbl,W/2,statY);
+    statY+=st.size;
+    ctx.fillStyle='#ffffff'; ctx.font='bold '+st.size+'px system-ui';
+    ctx.fillText(st.val,W/2,statY);
+    statY+=30;
+    ctx.fillStyle='rgba(255,140,0,0.2)'; ctx.fillRect(120,statY,W-240,1);
+    statY+=20;
+  });
+
+  // route map centered
+  var mapSize=W-160;
+  var routeCV=drawRouteCanvas(mapSize,mapSize,'transparent','#ff8c00',10);
+  ctx.drawImage(routeCV,80,statY+40);
+
+  // bottom bar
+  ctx.fillStyle='#ff8c00'; ctx.fillRect(0,H-8,W,8);
+
+  return cv;
+}
+
 function closeFinish(){
   document.getElementById('finish-modal').style.display='none';
   document.getElementById('running-view').classList.remove('active');
@@ -929,10 +1394,325 @@ function closeFinish(){
 // ===== SERVICE WORKER =====
 if('serviceWorker' in navigator){ window.addEventListener('load',function(){ navigator.serviceWorker.register('./sw.js').catch(function(){}); }); }
 
+// ═══════════════════════════════════════════════
+// HISTORY & DATABASE (IndexedDB)
+// ═══════════════════════════════════════════════
+
+var DB_NAME='paceTrainer', DB_VER=1, DB_STORE='activities';
+var db=null;
+
+function openDB(cb){
+  if(db){ cb(db); return; }
+  var req=indexedDB.open(DB_NAME, DB_VER);
+  req.onupgradeneeded=function(e){
+    var d=e.target.result;
+    if(!d.objectStoreNames.contains(DB_STORE)){
+      d.createObjectStore(DB_STORE,{keyPath:'id',autoIncrement:true});
+    }
+  };
+  req.onsuccess=function(e){ db=e.target.result; cb(db); };
+  req.onerror=function(){ console.error('DB error'); };
+}
+
+function saveActivity(activity, cb){
+  openDB(function(d){
+    var tx=d.transaction(DB_STORE,'readwrite');
+    var store=tx.objectStore(DB_STORE);
+    store.add(activity);
+    tx.oncomplete=function(){ if(cb) cb(); };
+  });
+}
+
+function getAllActivities(cb){
+  openDB(function(d){
+    var tx=d.transaction(DB_STORE,'readonly');
+    var store=tx.objectStore(DB_STORE);
+    var req=store.getAll();
+    req.onsuccess=function(e){ cb(e.target.result); };
+  });
+}
+
+function deleteActivity(id, cb){
+  openDB(function(d){
+    var tx=d.transaction(DB_STORE,'readwrite');
+    var store=tx.objectStore(DB_STORE);
+    store.delete(id);
+    tx.oncomplete=function(){ if(cb) cb(); };
+  });
+}
+
+// Save current activity when finishing
+function saveCurrentActivity(completed){
+  var distKm=totalDist/1000;
+  var avgKmh=(elapsed>0&&distKm>0)?(distKm/(elapsed/3600)):0;
+  var avgPaceSec=avgKmh>0?3600/avgKmh:0;
+  // effort: weighted avg of block paces vs target paces
+  var effortScore=0;
+  if(avgPaceSec>0 && blocks.length>0){
+    var targetPaceSec=blocks.reduce(function(a,b){ return a+(paceValid(b.pace)?paceToSec(b.pace)*b.duration:0); },0) /
+                      blocks.reduce(function(a,b){ return a+(paceValid(b.pace)?b.duration:0); },0);
+    effortScore=targetPaceSec>0?Math.round((targetPaceSec/avgPaceSec)*100):100;
+  }
+  var activity={
+    date: new Date().toISOString(),
+    name: blocks.map(function(b){return b.label;}).join(' + '),
+    distKm: parseFloat(distKm.toFixed(3)),
+    elapsedSec: elapsed,
+    avgKmh: parseFloat(avgKmh.toFixed(2)),
+    avgPaceSec: parseFloat(avgPaceSec.toFixed(1)),
+    blocks: blocks.map(function(b){return {label:b.label,duration:b.duration,pace:b.pace};}),
+    splits: kmSplits.map(function(s){return {km:s.km,paceStr:s.paceStr,paceSec:s.paceSec};}),
+    routePoints: routePoints.length>200 ? routePoints.filter(function(_,i){return i%Math.ceil(routePoints.length/200)===0;}) : routePoints,
+    effortScore: effortScore,
+    completed: completed
+  };
+  saveActivity(activity, function(){
+    updateNavSummary();
+  });
+}
+
+// VIEW SWITCHER
+function showView(name){
+  document.getElementById('setup-view').style.display   = name==='setup'   ? '' : 'none';
+  document.getElementById('history-view').style.display = name==='history' ? '' : 'none';
+  document.getElementById('detail-view').style.display  = name==='detail'  ? '' : 'none';
+  if(name==='history') loadHistoryView();
+}
+
+// ─── NAV SUMMARY (shown on setup screen) ───
+function updateNavSummary(){
+  getAllActivities(function(acts){
+    var totalKm=acts.reduce(function(a,b){return a+b.distKm;},0);
+    var el=document.getElementById('nav-hist-summary');
+    if(el) el.textContent=acts.length+' ativ · '+totalKm.toFixed(1)+' km total';
+  });
+}
+
+// ─── HISTORY SCREEN ───
+function loadHistoryView(){
+  getAllActivities(function(acts){
+    acts.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    renderHistStats(acts);
+    renderWeeklyChart(acts);
+    renderPRs(acts);
+    renderActivityList(acts);
+  });
+}
+
+function renderHistStats(acts){
+  var totalKm=acts.reduce(function(a,b){return a+b.distKm;},0);
+  document.getElementById('hs-total-km').textContent=totalKm.toFixed(1)+' km';
+  document.getElementById('hs-count').textContent=acts.length;
+
+  // Best pace (fastest avg pace among activities with >0.5km)
+  var withDist=acts.filter(function(a){return a.distKm>0.5&&a.avgPaceSec>0;});
+  if(withDist.length){
+    var best=withDist.reduce(function(a,b){return a.avgPaceSec<b.avgPaceSec?a:b;});
+    document.getElementById('hs-best-pace').textContent=secToPace(best.avgPaceSec)+'/km';
+  } else { document.getElementById('hs-best-pace').textContent='--'; }
+
+  // Longest distance
+  if(withDist.length){
+    var longest=withDist.reduce(function(a,b){return a.distKm>b.distKm?a:b;});
+    document.getElementById('hs-longest').textContent=longest.distKm.toFixed(2)+' km';
+  } else { document.getElementById('hs-longest').textContent='--'; }
+
+  // Relative effort: avg km/week last 4 weeks vs prior 4 weeks
+  var now=Date.now();
+  var w4=28*24*3600*1000;
+  var last4=acts.filter(function(a){return now-new Date(a.date)<w4;});
+  var prev4=acts.filter(function(a){var d=now-new Date(a.date);return d>=w4&&d<w4*2;});
+  var last4km=last4.reduce(function(a,b){return a+b.distKm;},0);
+  var prev4km=prev4.reduce(function(a,b){return a+b.distKm;},0);
+  var effortEl=document.getElementById('hs-effort');
+  if(prev4km>0){
+    var pct=Math.round(((last4km-prev4km)/prev4km)*100);
+    var tag=pct>5?'<span class="effort-pill effort-up">▲ +'+pct+'% esforço</span>':
+            pct<-5?'<span class="effort-pill effort-down">▼ '+pct+'% esforço</span>':
+            '<span class="effort-pill effort-same">= Estável</span>';
+    effortEl.innerHTML=last4km.toFixed(1)+'km (4 sem) '+tag;
+  } else if(last4km>0){
+    effortEl.textContent=last4km.toFixed(1)+' km nas últimas 4 semanas';
+  } else {
+    effortEl.textContent='Sem dados suficientes';
+  }
+}
+
+function renderWeeklyChart(acts){
+  // build last 8 weeks
+  var weeks=[];
+  for(var w=7;w>=0;w--){
+    var wEnd=new Date(Date.now()-w*7*24*3600*1000);
+    var wStart=new Date(wEnd-7*24*3600*1000);
+    var km=acts.filter(function(a){
+      var d=new Date(a.date); return d>=wStart&&d<wEnd;
+    }).reduce(function(a,b){return a+b.distKm;},0);
+    weeks.push({km:parseFloat(km.toFixed(1)), label:wEnd.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})});
+  }
+  var maxKm=Math.max.apply(null,weeks.map(function(w){return w.km;}))||1;
+  var chart=document.getElementById('weekly-chart');
+  var labels=document.getElementById('weekly-labels');
+  chart.innerHTML=''; labels.innerHTML='';
+  weeks.forEach(function(w,i){
+    var bar=document.createElement('div');
+    bar.className='week-bar'+(i===7?' current':'');
+    var pct=Math.max(4,(w.km/maxKm)*100);
+    bar.style.height=pct+'px';
+    bar.title=w.km+' km';
+    chart.appendChild(bar);
+    var lbl=document.createElement('div');
+    lbl.className='week-lbl';
+    lbl.textContent=i===7?'Esta':w.label;
+    labels.appendChild(lbl);
+  });
+}
+
+function renderPRs(acts){
+  var prs=[];
+  var withDist=acts.filter(function(a){return a.distKm>0.5&&a.avgPaceSec>0;});
+  if(!withDist.length){ document.getElementById('pr-section').style.display='none'; return; }
+  document.getElementById('pr-section').style.display='';
+
+  var bestPace=withDist.reduce(function(a,b){return a.avgPaceSec<b.avgPaceSec?a:b;});
+  prs.push({lbl:'Melhor ritmo',val:secToPace(bestPace.avgPaceSec)+'/km',date:bestPace.date});
+
+  var longest=withDist.reduce(function(a,b){return a.distKm>b.distKm?a:b;});
+  prs.push({lbl:'Maior distância',val:longest.distKm.toFixed(2)+' km',date:longest.date});
+
+  var longest_time=acts.reduce(function(a,b){return a.elapsedSec>b.elapsedSec?a:b;});
+  prs.push({lbl:'Maior duração',val:fmt(longest_time.elapsedSec),date:longest_time.date});
+
+  var bestEffort=withDist.filter(function(a){return a.effortScore>0;});
+  if(bestEffort.length){
+    var be=bestEffort.reduce(function(a,b){return a.effortScore>b.effortScore?a:b;});
+    prs.push({lbl:'Melhor esforço',val:be.effortScore+'%',date:be.date});
+  }
+
+  var list=document.getElementById('pr-list');
+  list.innerHTML='';
+  prs.forEach(function(pr){
+    var d=new Date(pr.date);
+    var dateStr=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+    var item=document.createElement('div');
+    item.className='pr-item';
+    item.innerHTML='<span class="pr-lbl">🏆 '+pr.lbl+'</span><span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><span class="pr-val">'+pr.val+'</span><span style="font-family:'Courier New',monospace;font-size:.58rem;color:var(--muted)">'+dateStr+'</span></span>';
+    list.appendChild(item);
+  });
+}
+
+function effortColor(score){
+  if(!score) return 'var(--border)';
+  if(score>=110) return '#ff4747';
+  if(score>=95)  return '#ff8c00';
+  if(score>=80)  return '#47ff8a';
+  return '#6b7280';
+}
+
+function renderActivityList(acts){
+  var list=document.getElementById('activity-list');
+  list.innerHTML='';
+  if(!acts.length){
+    list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:.85rem;padding:20px">Nenhuma atividade ainda.<br>Complete um treino para ver aqui!</div>';
+    return;
+  }
+  acts.forEach(function(act){
+    var d=new Date(act.date);
+    var dateStr=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+    var timeStr=d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    var item=document.createElement('div');
+    item.className='act-item';
+    item.innerHTML=
+      '<div class="act-effort" style="background:'+effortColor(act.effortScore)+'"></div>'+
+      '<div class="act-date">'+dateStr+'<br><span style="font-size:.58rem">'+timeStr+'</span></div>'+
+      '<div class="act-info">'+
+        '<div class="act-name">'+(act.name||'Treino')+(act.completed?' ✓':'')+'</div>'+
+        '<div class="act-meta">'+fmt(act.elapsedSec)+' · '+(act.avgPaceSec>0?secToPace(act.avgPaceSec)+'/km':'--pace')+'</div>'+
+      '</div>'+
+      '<div class="act-dist">'+(act.distKm>0?act.distKm.toFixed(2):'--.--')+' km</div>';
+    item.onclick=function(){ openActivityDetail(act); };
+    list.appendChild(item);
+  });
+}
+
+function openActivityDetail(act){
+  showView('detail');
+  var d=new Date(act.date);
+  document.getElementById('detail-title').textContent=d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'long'});
+  var content=document.getElementById('detail-content');
+
+  // mini route canvas
+  var routeHTML='';
+  if(act.routePoints&&act.routePoints.length>2){
+    var cv=drawRouteCanvas(600,300,'#13161a','#ff8c00',5);
+    // override routePoints temporarily
+    var orig=routePoints;
+    routePoints=act.routePoints;
+    var cv2=drawRouteCanvas(600,300,'#13161a','#ff8c00',5);
+    routePoints=orig;
+    routeHTML='<canvas id="detail-route-cv" style="width:100%;border-radius:12px;border:1px solid var(--border);margin-bottom:14px"></canvas>';
+  }
+
+  // splits
+  var splitsHTML='';
+  if(act.splits&&act.splits.length){
+    var maxP=Math.max.apply(null,act.splits.map(function(s){return s.paceSec;}));
+    var minP=Math.min.apply(null,act.splits.map(function(s){return s.paceSec;}));
+    var rng=maxP-minP||1;
+    splitsHTML='<div class="hist-section"><div class="hist-section-title">Parciais por km</div><table class="splits-table" style="width:100%"><thead><tr><th>Km</th><th>Ritmo</th><th></th></tr></thead><tbody>'+
+      act.splits.map(function(s){
+        var pct=Math.round(30+70*((maxP-s.paceSec)/rng));
+        return '<tr><td class="split-km">'+s.km+'</td><td class="split-pace">'+s.paceStr+'</td><td class="split-bar-cell"><div class="split-bar-bg"><div class="split-bar-fill" style="width:'+pct+'%"></div></div></td></tr>';
+      }).join('')+'</tbody></table></div>';
+  }
+
+  content.innerHTML=
+    (routeHTML?routeHTML:'')+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'+
+      '<div class="hstat-card"><div class="hstat-val">'+(act.distKm>0?act.distKm.toFixed(2)+' km':'--')+'</div><div class="hstat-lbl">Distância</div></div>'+
+      '<div class="hstat-card"><div class="hstat-val">'+fmt(act.elapsedSec)+'</div><div class="hstat-lbl">Tempo</div></div>'+
+      '<div class="hstat-card"><div class="hstat-val">'+(act.avgPaceSec>0?secToPace(act.avgPaceSec)+'/km':'--')+'</div><div class="hstat-lbl">Ritmo médio</div></div>'+
+      '<div class="hstat-card"><div class="hstat-val">'+(act.avgKmh>0?act.avgKmh.toFixed(1)+' km/h':'--')+'</div><div class="hstat-lbl">Vel. média</div></div>'+
+      (act.effortScore?'<div class="hstat-card" style="grid-column:span 2"><div class="hstat-val">'+act.effortScore+'%</div><div class="hstat-lbl">Esforço relativo</div></div>':'')+
+    '</div>'+
+    splitsHTML+
+    '<button onclick="confirmDeleteActivity('+act.id+')" style="width:100%;background:none;border:1px solid var(--red);color:var(--red);border-radius:10px;padding:12px;cursor:pointer;font-size:.85rem;margin-top:8px">🗑 Excluir atividade</button>';
+
+  // Draw route on the canvas element
+  if(act.routePoints&&act.routePoints.length>2){
+    setTimeout(function(){
+      var cvEl=document.getElementById('detail-route-cv');
+      if(!cvEl) return;
+      var orig=routePoints; routePoints=act.routePoints;
+      var cv=drawRouteCanvas(cvEl.offsetWidth*2,300,'#13161a','#ff8c00',5);
+      cvEl.width=cv.width; cvEl.height=cv.height;
+      cvEl.getContext('2d').drawImage(cv,0,0);
+      routePoints=orig;
+    },80);
+  }
+}
+
+function confirmDeleteActivity(id){
+  if(!confirm('Excluir esta atividade?')) return;
+  deleteActivity(id, function(){ showView('history'); });
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
 // ===== INIT =====
-renderBlocks(); updateSummary();
+renderBlocks(); updateSummary(); updateNavSummary();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+<!-- SHARE CARDS MODAL -->
+<div id="share-modal" style="display:none;position:fixed;inset:0;background:rgba(11,13,15,0.98);z-index:10000;flex-direction:column;align-items:center;padding:20px 16px 40px;gap:16px;overflow-y:auto;-webkit-overflow-scrolling:touch">
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%;max-width:480px">
+    <div style="font-weight:900;font-size:1.2rem;color:var(--accent);text-transform:uppercase;letter-spacing:.05em">Escolha um card</div>
+    <button onclick="closeShareModal()" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:.85rem">✕ Fechar</button>
+  </div>
+  <div style="font-family:'Courier New',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;width:100%;max-width:480px">Toque no card para baixar</div>
+  <div id="share-cards-container" style="display:flex;flex-direction:column;gap:20px;align-items:center;width:100%;max-width:480px"></div>
+</div>
+
 </body>
 </html>
