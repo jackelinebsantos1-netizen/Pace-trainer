@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0a0a0a">
+<meta name="theme-color" content="#0b0d0f">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,15 +15,15 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0a0a;--surface:#141414;--surface2:#1e1e1e;
-  --border:#2a2a2a;--accent:#ff6b00;--accent2:#ff9a3c;
-  --red:#ff4747;--orange:#ff6b00;--green:#47ff8a;
-  --text:#f5f5f5;--muted:#7a7a7a;
+  --bg:#0b0d0f;--surface:#13161a;--surface2:#1c2026;
+  --border:#2a2f38;--accent:#e8ff47;--accent2:#47ffd4;
+  --red:#ff4747;--orange:#ff9f47;--green:#47ff8a;
+  --text:#e8eaed;--muted:#6b7280;
 }
 body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh;min-height:100dvh;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 
 /* INSTALL BANNER */
-#install-banner{display:none;position:fixed;bottom:16px;left:16px;right:16px;background:var(--surface2);border:1px solid #ff6b00;border-radius:14px;padding:14px 16px;z-index:999;gap:12px;align-items:center;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+#install-banner{display:none;position:fixed;bottom:16px;left:16px;right:16px;background:var(--surface2);border:1px solid var(--accent);border-radius:14px;padding:14px 16px;z-index:999;gap:12px;align-items:center;box-shadow:0 8px 32px rgba(0,0,0,.6)}
 #install-banner.show{display:flex}
 .ib-icon{font-size:1.8rem;flex-shrink:0}
 .ib-text{font-size:.82rem;line-height:1.4;flex:1}
@@ -79,7 +79,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .run-elapsed-lbl{font-family:'Courier New',monospace;font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.15em}
 .run-elapsed{font-size:2.8rem;font-weight:900;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
 .wakelock-badge{display:inline-flex;align-items:center;gap:4px;font-family:'Courier New',monospace;font-size:.55rem;color:var(--muted);background:var(--surface2);border-radius:5px;padding:2px 7px;margin-left:8px;vertical-align:middle}
-.wakelock-badge.on{color:#ff6b00}
+.wakelock-badge.on{color:var(--green)}
 .stop-btn{background:var(--surface);border:1px solid var(--border);color:var(--red);border-radius:10px;padding:10px 16px;font-family:'Courier New',monospace;font-size:.72rem;letter-spacing:.08em;cursor:pointer;transition:all .2s}
 .stop-btn:active{background:rgba(255,71,71,.15)}
 
@@ -133,7 +133,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .total-progress{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
 .prog-labels{display:flex;justify-content:space-between;font-family:'Courier New',monospace;font-size:.63rem;color:var(--muted);margin-bottom:6px}
 .prog-bg{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden}
-.prog-fill{height:100%;background:linear-gradient(90deg,#ff6b00,#ff9a3c);border-radius:4px;transition:width 1s linear}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width 1s linear}
 
 .upcoming{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
 .upcoming-title{font-family:'Courier New',monospace;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.15em;margin-bottom:8px}
@@ -173,7 +173,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .splits-table tr:not(:last-child) td{border-bottom:1px solid rgba(255,255,255,.04)}
 .split-bar-cell{width:55%;padding:5px 14px 5px 0}
 .split-bar-bg{background:var(--surface2);border-radius:20px;height:14px;overflow:hidden}
-.split-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#ff6b00,#ff9a3c);transition:width .6s ease}
+.split-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s ease}
 .split-km{font-weight:700;color:var(--muted);font-size:.78rem;min-width:28px}
 .split-pace{color:var(--text);min-width:48px}
 
@@ -181,7 +181,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .flyover-wrap{width:100%;max-width:420px;border-radius:12px;overflow:hidden;border:1px solid var(--border);display:none}
 #flyover-map{width:100%;height:260px}
 .flyover-controls{display:flex;gap:8px;padding:10px 12px;background:var(--surface);border-top:1px solid var(--border);align-items:center;flex-wrap:wrap}
-.flyover-btn{background:#ff6b00;color:#000;border:none;border-radius:8px;padding:8px 18px;font-weight:700;font-size:.78rem;cursor:pointer;transition:opacity .2s}
+.flyover-btn{background:#ff8c00;color:#000;border:none;border-radius:8px;padding:8px 18px;font-weight:700;font-size:.78rem;cursor:pointer;transition:opacity .2s}
 .flyover-btn:active{opacity:.8}
 .flyover-btn:disabled{opacity:.35;cursor:default}
 .flyover-btn.stop{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
@@ -221,7 +221,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 <img id="shoe-img-cache" src="./corrida.png" style="display:none" crossorigin="anonymous">
 
 <!-- UPDATE BANNER -->
-<div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:#1c2026;border-bottom:2px solid #ff6b00;z-index:99999;padding:12px 16px;align-items:center;gap:12px;justify-content:space-between">
+<div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:#1c2026;border-bottom:2px solid var(--accent);z-index:99999;padding:12px 16px;align-items:center;gap:12px;justify-content:space-between">
   <div style="font-size:.85rem;color:var(--text)">🔄 <strong>Nova versão disponível!</strong></div>
   <button onclick="applyUpdate()" style="background:var(--accent);color:#000;border:none;border-radius:8px;padding:8px 16px;font-weight:700;font-size:.8rem;cursor:pointer;white-space:nowrap">Atualizar agora</button>
 </div>
@@ -275,7 +275,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
   <div class="flyover-wrap" id="flyover-wrap" style="width:100%;max-width:480px">
     <div id="flyover-map" style="width:100%;height:280px;background:var(--surface2)"></div>
     <div style="background:var(--surface2);height:3px;width:100%">
-      <div id="flyover-prog" style="height:100%;background:linear-gradient(90deg,#ff6b00,#ff9a3c);width:0%;transition:width 0.15s linear"></div>
+      <div id="flyover-prog" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width 0.15s linear"></div>
     </div>
     <div class="flyover-controls">
       <button class="flyover-btn" id="flyover-play-btn" onclick="startFlyover()" disabled>▶ Voar</button>
@@ -846,12 +846,12 @@ function initMapboxMap(){
     flyoverMap.addLayer({
       id:'route-live-glow', type:'line', source:'route-live',
       layout:{'line-join':'round','line-cap':'round'},
-      paint:{'line-color':'#ff6b00','line-width':10,'line-opacity':0.35,'line-blur':6}
+      paint:{'line-color':'#e8ff47','line-width':10,'line-opacity':0.35,'line-blur':6}
     });
     flyoverMap.addLayer({
       id:'route-live', type:'line', source:'route-live',
       layout:{'line-join':'round','line-cap':'round'},
-      paint:{'line-color':'#ff6b00','line-width':5,'line-opacity':1}
+      paint:{'line-color':'#e8ff47','line-width':5,'line-opacity':1}
     });
 
     // ── Marcador de início (verde) ──
@@ -1132,24 +1132,28 @@ function cardMapFull(s){
 
   // route map area
   var mapH=H*0.58;
-  var routeCV=drawRouteCanvas(W, mapH, 'transparent', '#ff6b00', 7);
+  var routeCV=drawRouteCanvas(W, mapH, 'transparent', '#e8ff47', 7);
   ctx.drawImage(routeCV,0,0);
 
   // separator line
   ctx.fillStyle='rgba(255,140,0,0.3)'; ctx.fillRect(60,mapH+10,W-120,1);
 
-  // shoe image
-  try{
-    var shoeImg=document.getElementById('shoe-img-cache');
-    if(shoeImg && shoeImg.complete) ctx.drawImage(shoeImg, W/2-60, mapH+20, 120, 120);
-  }catch(e){}
-
-  // APP name
-  ctx.fillStyle='rgba(255,255,255,0.9)';
-  ctx.font='bold 52px system-ui,-apple-system,sans-serif';
-  ctx.letterSpacing='8px';
-  ctx.textAlign='center';
-  ctx.fillText('JACKE RUN', W/2, mapH+145);
+  // Shoe + JACKE RUN side by side
+  var shoeImg=document.getElementById('shoe-img-cache');
+  var shoeSize=110;
+  var brandY=mapH+40;
+  // measure text to center the group
+  ctx.font='bold 90px system-ui,-apple-system,sans-serif';
+  var textW=ctx.measureText('JACKE RUN').width;
+  var gap=20;
+  var groupW=shoeSize+gap+textW;
+  var groupX=(W-groupW)/2;
+  if(shoeImg&&shoeImg.complete){
+    ctx.drawImage(shoeImg, groupX, brandY, shoeSize, shoeSize);
+  }
+  ctx.fillStyle='rgba(255,255,255,0.95)';
+  ctx.textAlign='left';
+  ctx.fillText('JACKE RUN', groupX+shoeSize+gap, brandY+shoeSize*0.75);
 
   // stats row
   var cols=[
@@ -1197,9 +1201,13 @@ function cardDataMap(s){
   ctx.fillStyle='rgba(255,140,0,0.12)'; ctx.fillRect(0,0,W,topH);
 
   // shoe icon + app
-  try{ var si=document.getElementById('shoe-img-cache'); if(si&&si.complete) ctx.drawImage(si,50,20,90,90); }catch(e){}
-  ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='bold 58px system-ui';
-  ctx.fillText('JACKE RUN',150,90);
+    var si2=document.getElementById('shoe-img-cache');
+  var sz2=80;
+  if(si2&&si2.complete) ctx.drawImage(si2, 50, 14, sz2, sz2);
+  ctx.fillStyle='rgba(255,255,255,0.95)';
+  ctx.font='bold 64px system-ui';
+  ctx.textAlign='left';
+  ctx.fillText('JACKE RUN', 50+sz2+16, 76);
 
   // 6 stats grid
   var stats2=[
@@ -1221,7 +1229,7 @@ function cardDataMap(s){
 
   // map section
   var mapY=topH+20, mapH=H-mapY-20;
-  var routeCV=drawRouteCanvas(W-80, mapH, 'transparent','#ff6b00',8);
+  var routeCV=drawRouteCanvas(W-80, mapH, 'transparent','#e8ff47',8);
   ctx.drawImage(routeCV,40,mapY);
 
   return cv;
@@ -1240,14 +1248,18 @@ function cardMinimal(s){
 
   // left: route
   var mapW=W*0.42;
-  var routeCV=drawRouteCanvas(mapW,H,'transparent','#ff6b00',6);
+  var routeCV=drawRouteCanvas(mapW,H,'transparent','#e8ff47',6);
   ctx.drawImage(routeCV,0,0);
 
   // right: stats
   var rx=mapW+60;
-  ctx.fillStyle='rgba(255,255,255,0.9)';
-  ctx.font='bold 42px system-ui'; ctx.textAlign='left';
-  ctx.fillText('🏃 JACKE RUN',rx,70);
+  // Shoe + JACKE RUN
+  var si3=document.getElementById('shoe-img-cache');
+  var sz3=60;
+  if(si3&&si3.complete) ctx.drawImage(si3, rx, 12, sz3, sz3);
+  ctx.fillStyle='rgba(255,255,255,0.95)';
+  ctx.font='bold 44px system-ui'; ctx.textAlign='left';
+  ctx.fillText('JACKE RUN', rx+sz3+12, 58);
 
   ctx.fillStyle='rgba(255,140,0,0.6)'; ctx.fillRect(rx,90,W-rx-60,2);
 
@@ -1279,11 +1291,19 @@ function cardVertical(s){
   ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
 
   // top bar laranja
-  ctx.fillStyle='#ff6b00'; ctx.fillRect(0,0,W,8);
+  ctx.fillStyle='#e8ff47'; ctx.fillRect(0,0,W,8);
 
-  // title
-  ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='bold 72px system-ui'; ctx.textAlign='center';
-  ctx.fillText('🏃 JACKE RUN',W/2,120);
+  // Shoe + JACKE RUN centered
+  var si4=document.getElementById('shoe-img-cache');
+  var sz4=100;
+  ctx.font='bold 80px system-ui';
+  var tw4=ctx.measureText('JACKE RUN').width;
+  var gap4=20;
+  var gx4=(W-(sz4+gap4+tw4))/2;
+  if(si4&&si4.complete) ctx.drawImage(si4, gx4, 20, sz4, sz4);
+  ctx.fillStyle='rgba(255,255,255,0.95)';
+  ctx.textAlign='left';
+  ctx.fillText('JACKE RUN', gx4+sz4+gap4, 100);
 
   // big stats
   var bigStats=[
@@ -1306,11 +1326,11 @@ function cardVertical(s){
 
   // route map centered
   var mapSize=W-160;
-  var routeCV=drawRouteCanvas(mapSize,mapSize,'transparent','#ff6b00',10);
+  var routeCV=drawRouteCanvas(mapSize,mapSize,'transparent','#e8ff47',10);
   ctx.drawImage(routeCV,80,statY+40);
 
   // bottom bar
-  ctx.fillStyle='#ff6b00'; ctx.fillRect(0,H-8,W,8);
+  ctx.fillStyle='#e8ff47'; ctx.fillRect(0,H-8,W,8);
 
   return cv;
 }
