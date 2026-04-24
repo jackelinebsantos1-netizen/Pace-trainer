@@ -1,11 +1,11 @@
 {
-  "name": "Pace Trainer",
-  "short_name": "PaceTrainer",
+  "name": "Jacke Run",
+  "short_name": "JackeRun",
   "description": "Controle de ritmo para corrida",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0b0d0f",
-  "theme_color": "#0b0d0f",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
   "orientation": "portrait",
   "icons": [
     {

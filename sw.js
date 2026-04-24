@@ -1,6 +1,6 @@
 // Mude este número toda vez que atualizar o app
-const CACHE = 'pace-trainer-v12';
-const FILES = ['./index.html', './manifest.json'];
+const CACHE = 'jacke-run-v3';
+const FILES = ['./index.html', './manifest.json', './corrida.png'];
 
 self.addEventListener('install', e => {
   // Força instalação imediata sem esperar aba fechar

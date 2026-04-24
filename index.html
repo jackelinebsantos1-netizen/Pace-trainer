@@ -3,27 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0b0d0f">
+<meta name="theme-color" content="#0a0a0a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="PaceTrainer">
+<meta name="apple-mobile-web-app-title" content="JackeRun">
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
-<title>Pace Trainer</title>
+<title>Jacke Run</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0b0d0f;--surface:#13161a;--surface2:#1c2026;
-  --border:#2a2f38;--accent:#e8ff47;--accent2:#47ffd4;
-  --red:#ff4747;--orange:#ff9f47;--green:#47ff8a;
-  --text:#e8eaed;--muted:#6b7280;
+  --bg:#0a0a0a;--surface:#141414;--surface2:#1e1e1e;
+  --border:#2a2a2a;--accent:#ff6b00;--accent2:#ff9a3c;
+  --red:#ff4747;--orange:#ff6b00;--green:#47ff8a;
+  --text:#f5f5f5;--muted:#7a7a7a;
 }
 body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh;min-height:100dvh;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 
 /* INSTALL BANNER */
-#install-banner{display:none;position:fixed;bottom:16px;left:16px;right:16px;background:var(--surface2);border:1px solid var(--accent);border-radius:14px;padding:14px 16px;z-index:999;gap:12px;align-items:center;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+#install-banner{display:none;position:fixed;bottom:16px;left:16px;right:16px;background:var(--surface2);border:1px solid #ff6b00;border-radius:14px;padding:14px 16px;z-index:999;gap:12px;align-items:center;box-shadow:0 8px 32px rgba(0,0,0,.6)}
 #install-banner.show{display:flex}
 .ib-icon{font-size:1.8rem;flex-shrink:0}
 .ib-text{font-size:.82rem;line-height:1.4;flex:1}
@@ -79,7 +79,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .run-elapsed-lbl{font-family:'Courier New',monospace;font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.15em}
 .run-elapsed{font-size:2.8rem;font-weight:900;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
 .wakelock-badge{display:inline-flex;align-items:center;gap:4px;font-family:'Courier New',monospace;font-size:.55rem;color:var(--muted);background:var(--surface2);border-radius:5px;padding:2px 7px;margin-left:8px;vertical-align:middle}
-.wakelock-badge.on{color:var(--green)}
+.wakelock-badge.on{color:#ff6b00}
 .stop-btn{background:var(--surface);border:1px solid var(--border);color:var(--red);border-radius:10px;padding:10px 16px;font-family:'Courier New',monospace;font-size:.72rem;letter-spacing:.08em;cursor:pointer;transition:all .2s}
 .stop-btn:active{background:rgba(255,71,71,.15)}
 
@@ -133,7 +133,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .total-progress{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
 .prog-labels{display:flex;justify-content:space-between;font-family:'Courier New',monospace;font-size:.63rem;color:var(--muted);margin-bottom:6px}
 .prog-bg{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width 1s linear}
+.prog-fill{height:100%;background:linear-gradient(90deg,#ff6b00,#ff9a3c);border-radius:4px;transition:width 1s linear}
 
 .upcoming{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
 .upcoming-title{font-family:'Courier New',monospace;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.15em;margin-bottom:8px}
@@ -163,7 +163,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .finish-stat-lbl{font-family:'Courier New',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.15em;color:var(--muted)}
 
 /* SPLITS TABLE */
-.splits-wrap{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:none}
+.splits-wrap{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .splits-title{font-family:"Courier New",monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);padding:10px 14px 6px}
 .splits-table{width:100%;border-collapse:collapse}
 .splits-table th{font-family:"Courier New",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);padding:4px 14px 6px;text-align:left;border-bottom:1px solid var(--border)}
@@ -173,7 +173,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .splits-table tr:not(:last-child) td{border-bottom:1px solid rgba(255,255,255,.04)}
 .split-bar-cell{width:55%;padding:5px 14px 5px 0}
 .split-bar-bg{background:var(--surface2);border-radius:20px;height:14px;overflow:hidden}
-.split-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#3b82f6,#60a5fa);transition:width .6s ease}
+.split-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#ff6b00,#ff9a3c);transition:width .6s ease}
 .split-km{font-weight:700;color:var(--muted);font-size:.78rem;min-width:28px}
 .split-pace{color:var(--text);min-width:48px}
 
@@ -181,7 +181,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .flyover-wrap{width:100%;max-width:420px;border-radius:12px;overflow:hidden;border:1px solid var(--border);display:none}
 #flyover-map{width:100%;height:260px}
 .flyover-controls{display:flex;gap:8px;padding:10px 12px;background:var(--surface);border-top:1px solid var(--border);align-items:center;flex-wrap:wrap}
-.flyover-btn{background:#ff8c00;color:#000;border:none;border-radius:8px;padding:8px 18px;font-weight:700;font-size:.78rem;cursor:pointer;transition:opacity .2s}
+.flyover-btn{background:#ff6b00;color:#000;border:none;border-radius:8px;padding:8px 18px;font-weight:700;font-size:.78rem;cursor:pointer;transition:opacity .2s}
 .flyover-btn:active{opacity:.8}
 .flyover-btn:disabled{opacity:.35;cursor:default}
 .flyover-btn.stop{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
@@ -217,8 +217,11 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 </head>
 <body>
 
+<!-- Preload shoe image for canvas cards -->
+<img id="shoe-img-cache" src="./corrida.png" style="display:none" crossorigin="anonymous">
+
 <!-- UPDATE BANNER -->
-<div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:#1c2026;border-bottom:2px solid var(--accent);z-index:99999;padding:12px 16px;align-items:center;gap:12px;justify-content:space-between">
+<div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:#1c2026;border-bottom:2px solid #ff6b00;z-index:99999;padding:12px 16px;align-items:center;gap:12px;justify-content:space-between">
   <div style="font-size:.85rem;color:var(--text)">🔄 <strong>Nova versão disponível!</strong></div>
   <button onclick="applyUpdate()" style="background:var(--accent);color:#000;border:none;border-radius:8px;padding:8px 16px;font-weight:700;font-size:.8rem;cursor:pointer;white-space:nowrap">Atualizar agora</button>
 </div>
@@ -236,7 +239,9 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 
 <!-- FINISH MODAL — must be in DOM before scripts run -->
 <div id="finish-modal">
-  <div id="finish-emoji" style="font-size:3.5rem;line-height:1">🏁</div>
+  <div id="finish-emoji-wrap" style="width:80px;height:80px;border-radius:16px;overflow:hidden;flex-shrink:0">
+    <img src="./corrida.png" style="width:100%;height:100%;object-fit:cover" alt="corrida">
+  </div>
   <div id="finish-title" style="font-size:2rem;font-weight:900;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;text-align:center">Treino Concluído!</div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%;max-width:480px">
     <div class="finish-stat">
@@ -259,7 +264,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
   <div id="finish-map-wrap" style="width:100%;max-width:480px;border-radius:12px;overflow:hidden;border:1px solid var(--border);display:none">
     <div id="finish-map" style="width:100%;height:220px;background:var(--surface2)"></div>
   </div>
-  <div class="splits-wrap" id="splits-wrap" style="width:100%;max-width:480px">
+  <div class="splits-wrap" id="splits-wrap" style="width:100%;max-width:480px;display:none">
     <div class="splits-title">Parciais por km</div>
     <table class="splits-table">
       <thead><tr><th>Km</th><th>Ritmo</th><th></th></tr></thead>
@@ -270,7 +275,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
   <div class="flyover-wrap" id="flyover-wrap" style="width:100%;max-width:480px">
     <div id="flyover-map" style="width:100%;height:280px;background:var(--surface2)"></div>
     <div style="background:var(--surface2);height:3px;width:100%">
-      <div id="flyover-prog" style="height:100%;background:linear-gradient(90deg,#ff6a00,#ff8c00);width:0%;transition:width 0.15s linear"></div>
+      <div id="flyover-prog" style="height:100%;background:linear-gradient(90deg,#ff6b00,#ff9a3c);width:0%;transition:width 0.15s linear"></div>
     </div>
     <div class="flyover-controls">
       <button class="flyover-btn" id="flyover-play-btn" onclick="startFlyover()" disabled>▶ Voar</button>
@@ -287,7 +292,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
   </div>
 
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px">
-    <button onclick="openShareModal()" style="background:#ff8c00;color:#000;border:none;border-radius:12px;padding:16px 28px;font-weight:900;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%">📸 Gerar Cards</button>
+    <button onclick="openShareModal()" style="background:#ff6b00;color:#000;border:none;border-radius:12px;padding:16px 28px;font-weight:900;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%">📸 Gerar Cards</button>
     <button id="finish-new-btn" style="background:var(--accent);color:#000;border:none;border-radius:12px;padding:16px 28px;font-weight:900;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">▶ Novo Treino</button>
     <button id="finish-exit-btn" style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:16px 28px;font-weight:700;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">✕ Sair</button>
   </div>
@@ -295,7 +300,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 
 <!-- SETUP VIEW -->
 <div class="app" id="setup-view">
-  <h1>Pace Trainer</h1>
+  <h1>Jacke Run</h1>
   <div class="subtitle">Controle de ritmo para corrida</div>
   <div class="gps-banner">
     <div class="gps-dot" id="setup-gps-dot"></div>
@@ -687,13 +692,16 @@ function showFinish(completed){
   document.getElementById('fin-time').textContent=fmt(elapsed);
   document.getElementById('fin-spd').textContent=avgKmh>0?avgKmh.toFixed(1)+' km/h':'--';
   document.getElementById('fin-pace').textContent=avgPaceSec>0?secToPace(avgPaceSec)+' /km':'--';
-  document.getElementById('finish-emoji').textContent=completed?'🏁':'⏹';
+  // image stays constant — no emoji swap needed
   document.getElementById('finish-title').textContent=completed?'Treino Concluído!':'Treino Encerrado';
-  // add last partial km if any distance remaining
-  if(routePoints.length>0&&totalDist-lastSplitDist>50){
-    var remDist=totalDist-lastSplitDist;
-    var remTime=(Date.now()-lastSplitTime)/1000;
-    if(remDist>0&&remTime>0) kmSplits.push({km:'+'+(remDist/1000).toFixed(1),paceStr:secToPace(remTime/(remDist/1000)),paceSec:remTime/(remDist/1000)});
+  // add last partial km if any GPS distance remaining
+  if(routePoints.length > 0 && totalDist - lastSplitDist > 50){
+    var remDist = totalDist - lastSplitDist;
+    var remTime = (Date.now() - lastSplitTime) / 1000;
+    if(remDist > 0 && remTime > 0){
+      var remPace = remTime / (remDist / 1000);
+      kmSplits.push({ km: '+' + (remDist/1000).toFixed(1), paceStr: secToPace(remPace), paceSec: remPace });
+    }
   }
   document.getElementById('finish-modal').style.display='flex';
   if(distKm>0) falar('Distância percorrida: '+distKm.toFixed(2)+' quilômetros. Velocidade média: '+avgKmh.toFixed(1)+' quilômetros por hora.');
@@ -701,39 +709,55 @@ function showFinish(completed){
 }
 
 function renderSplits(){
-  var wrap=document.getElementById('splits-wrap');
-  // fallback: build estimated splits from block timing if no GPS
-  if(kmSplits.length===0 && elapsed>0){
-    var estSplits=[];
-    var runSec=0;
+  var wrap = document.getElementById('splits-wrap');
+  var tbody = document.getElementById('splits-tbody');
+
+  // ── Fallback: estimate splits from block config if no GPS data ──
+  if(kmSplits.length === 0){
+    var est = [];
     blocks.forEach(function(b){
       if(!paceValid(b.pace)) return;
-      var blockSec=b.duration*60;
-      var paceSec=paceToSec(b.pace);
-      var distKm=blockSec/paceSec;
-      var fullKms=Math.floor(distKm);
-      for(var k=0;k<fullKms;k++) estSplits.push({km:estSplits.length+1,paceStr:b.pace,paceSec:paceSec});
-      if(distKm-fullKms>0.05) estSplits.push({km:'+'+(distKm-fullKms).toFixed(1),paceStr:b.pace,paceSec:paceSec});
-      runSec+=blockSec;
+      var paceSec  = paceToSec(b.pace);
+      var distKm   = (b.duration * 60) / paceSec;
+      var full     = Math.floor(distKm);
+      for(var k = 0; k < full; k++){
+        est.push({ km: est.length + 1, paceStr: b.pace, paceSec: paceSec });
+      }
+      var rem = distKm - full;
+      if(rem > 0.05){
+        est.push({ km: '+' + rem.toFixed(1), paceStr: b.pace, paceSec: paceSec });
+      }
     });
-    if(estSplits.length>0) kmSplits=estSplits;
+    if(est.length > 0) kmSplits = est;
   }
-  if(kmSplits.length===0){ wrap.style.display='none'; return; }
-  wrap.style.display='block';
-  var fastest=Math.min.apply(null,kmSplits.map(function(s){return s.paceSec;}));
-  var slowest=Math.max.apply(null,kmSplits.map(function(s){return s.paceSec;}));
-  var range=slowest-fastest||1;
-  var tbody=document.getElementById('splits-tbody');
-  tbody.innerHTML='';
+
+  if(kmSplits.length === 0){
+    wrap.style.display = 'none';
+    return;
+  }
+
+  // ── Render table ──
+  var paces   = kmSplits.map(function(s){ return s.paceSec; });
+  var fastest = Math.min.apply(null, paces);
+  var slowest = Math.max.apply(null, paces);
+  var range   = slowest - fastest || 1;
+
+  tbody.innerHTML = '';
   kmSplits.forEach(function(s){
-    var barPct=Math.round(30+70*((slowest-s.paceSec)/range));
-    var tr=document.createElement('tr');
-    tr.innerHTML=
-      '<td class="split-km">'+s.km+'</td>'+
-      '<td class="split-pace">'+s.paceStr+'</td>'+
-      '<td class="split-bar-cell"><div class="split-bar-bg"><div class="split-bar-fill" style="width:'+barPct+'%"></div></div></td>';
+    var barPct = Math.round(20 + 80 * ((slowest - s.paceSec) / range));
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="split-km">' + s.km + '</td>' +
+      '<td class="split-pace">' + s.paceStr + '</td>' +
+      '<td class="split-bar-cell">' +
+        '<div class="split-bar-bg">' +
+          '<div class="split-bar-fill" style="width:' + barPct + '%"></div>' +
+        '</div>' +
+      '</td>';
     tbody.appendChild(tr);
   });
+
+  wrap.style.display = 'block';
 }
 
 function initFlyover(){
@@ -822,12 +846,12 @@ function initMapboxMap(){
     flyoverMap.addLayer({
       id:'route-live-glow', type:'line', source:'route-live',
       layout:{'line-join':'round','line-cap':'round'},
-      paint:{'line-color':'#ff6a00','line-width':10,'line-opacity':0.35,'line-blur':6}
+      paint:{'line-color':'#ff6b00','line-width':10,'line-opacity':0.35,'line-blur':6}
     });
     flyoverMap.addLayer({
       id:'route-live', type:'line', source:'route-live',
       layout:{'line-join':'round','line-cap':'round'},
-      paint:{'line-color':'#ff8c00','line-width':5,'line-opacity':1}
+      paint:{'line-color':'#ff6b00','line-width':5,'line-opacity':1}
     });
 
     // ── Marcador de início (verde) ──
@@ -838,7 +862,7 @@ function initMapboxMap(){
     // ── Cursor (corredor) animado ──
     var dotEl=document.createElement('div');
     dotEl.id='flyover-dot';
-    dotEl.style.cssText='width:16px;height:16px;border-radius:50%;background:#ff8c00;border:3px solid #fff;box-shadow:0 0 14px #ff8c00;transition:none';
+    dotEl.style.cssText='width:16px;height:16px;border-radius:50%;background:#ff6b00;border:3px solid #fff;box-shadow:0 0 14px #ff6b00;transition:none';
     flyoverDotMarker=new mapboxgl.Marker({element:dotEl}).setLngLat(coords[0]).addTo(flyoverMap);
 
     // fit overview primeiro
@@ -1044,7 +1068,7 @@ function getStats(){
 
 function downloadCanvas(cv, name){
   var a=document.createElement('a');
-  a.download=name||'pace-trainer-card.png';
+  a.download=name||'jacke-run-card.png';
   a.href=cv.toDataURL('image/png');
   a.click();
 }
@@ -1083,7 +1107,7 @@ function generateAllCards(){
     var dCtx=display.getContext('2d');
     dCtx.drawImage(cv,0,0,display.width,display.height);
 
-    display.onclick=function(){ downloadCanvas(cv,'pace-trainer-card-'+(i+1)+'.png'); };
+    display.onclick=function(){ downloadCanvas(cv,'jacke-run-card-'+(i+1)+'.png'); };
 
     var hint=document.createElement('div');
     hint.style.cssText='font-family:"Courier New",monospace;font-size:.6rem;color:var(--muted);text-align:center;margin-top:4px;margin-bottom:4px';
@@ -1108,24 +1132,24 @@ function cardMapFull(s){
 
   // route map area
   var mapH=H*0.58;
-  var routeCV=drawRouteCanvas(W, mapH, 'transparent', '#ff8c00', 7);
+  var routeCV=drawRouteCanvas(W, mapH, 'transparent', '#ff6b00', 7);
   ctx.drawImage(routeCV,0,0);
 
   // separator line
   ctx.fillStyle='rgba(255,140,0,0.3)'; ctx.fillRect(60,mapH+10,W-120,1);
 
-  // icon shoe (simple SVG-like)
-  ctx.fillStyle='#fff';
-  ctx.font='bold 52px system-ui';
-  ctx.textAlign='center';
-  ctx.fillText('🏃', W/2, mapH+80);
+  // shoe image
+  try{
+    var shoeImg=document.getElementById('shoe-img-cache');
+    if(shoeImg && shoeImg.complete) ctx.drawImage(shoeImg, W/2-60, mapH+20, 120, 120);
+  }catch(e){}
 
   // APP name
   ctx.fillStyle='rgba(255,255,255,0.9)';
   ctx.font='bold 52px system-ui,-apple-system,sans-serif';
   ctx.letterSpacing='8px';
   ctx.textAlign='center';
-  ctx.fillText('PACE TRAINER', W/2, mapH+145);
+  ctx.fillText('JACKE RUN', W/2, mapH+145);
 
   // stats row
   var cols=[
@@ -1173,9 +1197,9 @@ function cardDataMap(s){
   ctx.fillStyle='rgba(255,140,0,0.12)'; ctx.fillRect(0,0,W,topH);
 
   // shoe icon + app
-  ctx.font='60px system-ui'; ctx.textAlign='left'; ctx.fillText('🏃',60,90);
+  try{ var si=document.getElementById('shoe-img-cache'); if(si&&si.complete) ctx.drawImage(si,50,20,90,90); }catch(e){}
   ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='bold 58px system-ui';
-  ctx.fillText('PACE TRAINER',150,90);
+  ctx.fillText('JACKE RUN',150,90);
 
   // 6 stats grid
   var stats2=[
@@ -1197,7 +1221,7 @@ function cardDataMap(s){
 
   // map section
   var mapY=topH+20, mapH=H-mapY-20;
-  var routeCV=drawRouteCanvas(W-80, mapH, 'transparent','#ff8c00',8);
+  var routeCV=drawRouteCanvas(W-80, mapH, 'transparent','#ff6b00',8);
   ctx.drawImage(routeCV,40,mapY);
 
   return cv;
@@ -1216,14 +1240,14 @@ function cardMinimal(s){
 
   // left: route
   var mapW=W*0.42;
-  var routeCV=drawRouteCanvas(mapW,H,'transparent','#ff8c00',6);
+  var routeCV=drawRouteCanvas(mapW,H,'transparent','#ff6b00',6);
   ctx.drawImage(routeCV,0,0);
 
   // right: stats
   var rx=mapW+60;
   ctx.fillStyle='rgba(255,255,255,0.9)';
   ctx.font='bold 42px system-ui'; ctx.textAlign='left';
-  ctx.fillText('🏃 PACE TRAINER',rx,70);
+  ctx.fillText('🏃 JACKE RUN',rx,70);
 
   ctx.fillStyle='rgba(255,140,0,0.6)'; ctx.fillRect(rx,90,W-rx-60,2);
 
@@ -1255,11 +1279,11 @@ function cardVertical(s){
   ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
 
   // top bar laranja
-  ctx.fillStyle='#ff8c00'; ctx.fillRect(0,0,W,8);
+  ctx.fillStyle='#ff6b00'; ctx.fillRect(0,0,W,8);
 
   // title
   ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='bold 72px system-ui'; ctx.textAlign='center';
-  ctx.fillText('🏃 PACE TRAINER',W/2,120);
+  ctx.fillText('🏃 JACKE RUN',W/2,120);
 
   // big stats
   var bigStats=[
@@ -1282,11 +1306,11 @@ function cardVertical(s){
 
   // route map centered
   var mapSize=W-160;
-  var routeCV=drawRouteCanvas(mapSize,mapSize,'transparent','#ff8c00',10);
+  var routeCV=drawRouteCanvas(mapSize,mapSize,'transparent','#ff6b00',10);
   ctx.drawImage(routeCV,80,statY+40);
 
   // bottom bar
-  ctx.fillStyle='#ff8c00'; ctx.fillRect(0,H-8,W,8);
+  ctx.fillStyle='#ff6b00'; ctx.fillRect(0,H-8,W,8);
 
   return cv;
 }
