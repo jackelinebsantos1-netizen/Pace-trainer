@@ -398,6 +398,7 @@ var running=false,currentBlock=0,elapsed=0,blockElapsed=0;
 var warningGiven=false,intervalId=null,startTime=null,blockStart=null;
 var audioCtx=null,watchId=null,prevPos=null,prevTime=null;
 var gpsReady=false,lastPaceAlertSec=0,totalDist=0;
+var lastKnownPaceSec=0; // last GPS pace, used for 20s voice timer
 var routePoints=[]; // array de {lat,lng,time} para o mapa
 var kmSplits=[]; // parciais por km [{km, paceStr, distM}]
 var lastSplitDist=0, lastSplitTime=0;
@@ -515,9 +516,10 @@ function onGPS(pos){
         }
         lastSplitDist=totalDist; lastSplitTime=now;
       }
+      lastKnownPaceSec=1000/spd;
       document.getElementById('pm-sim-wrap').style.display='none';
       document.getElementById('dist-val').textContent=(totalDist/1000).toFixed(2)+' km';
-      updatePaceMonitor(1000/spd);
+      updatePaceMonitor(lastKnownPaceSec);
     }
   }
   prevPos=pos; prevTime=now;
@@ -543,7 +545,7 @@ function updatePaceMonitor(secPerKm){
     else{ falar('É só manter!'); addLog('🔊 "É só manter!" — '+livePace+'/km','start'); }
   }
 }
-function simulatePace(sec){ document.getElementById('sim-label').textContent=secToPace(sec)+'/km'; updatePaceMonitor(sec); }
+function simulatePace(sec){ lastKnownPaceSec=sec; document.getElementById('sim-label').textContent=secToPace(sec)+'/km'; updatePaceMonitor(sec); }
 
 // ===== RENDER BLOCKS =====
 function renderBlocks(){
@@ -583,7 +585,7 @@ function totalDurSec(){ return blocks.reduce(function(a,b){return a+b.duration*6
 function startWorkout(){
   getAudio();
   running=true; currentBlock=0; elapsed=0; blockElapsed=0;
-  warningGiven=false; lastPaceAlertSec=0; totalDist=0; routePoints=[]; kmSplits=[]; lastSplitDist=0; lastSplitTime=Date.now();
+  warningGiven=false; lastPaceAlertSec=0; totalDist=0; routePoints=[]; kmSplits=[]; lastSplitDist=0; lastSplitTime=Date.now(); lastKnownPaceSec=0;
   startTime=Date.now(); blockStart=Date.now();
   document.getElementById('setup-view').style.display='none';
   document.getElementById('running-view').classList.add('active');
@@ -638,6 +640,13 @@ function tick(){
       playChange(); falar(blocks[nextIdx].label);
       addLog('🔄 '+blocks[nextIdx].label+' — alvo '+blocks[nextIdx].pace+'/km','change');
       renderUpcoming();
+    }
+  }
+  // ── Voice pace alert every 20s (independent of GPS update frequency) ──
+  if(lastKnownPaceSec>0){
+    var nowSec=Date.now()/1000;
+    if(nowSec-lastPaceAlertSec>=20){
+      updatePaceMonitor(lastKnownPaceSec); // triggers voice + log
     }
   }
   updateRunUI();
