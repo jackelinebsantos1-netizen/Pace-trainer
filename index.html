@@ -217,9 +217,6 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 </head>
 <body>
 
-<!-- Preload shoe image for canvas cards -->
-<img id="shoe-img-cache" src="./corrida.png" style="display:none" crossorigin="anonymous">
-
 <!-- UPDATE BANNER -->
 <div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:#1c2026;border-bottom:2px solid var(--accent);z-index:99999;padding:12px 16px;align-items:center;gap:12px;justify-content:space-between">
   <div style="font-size:.85rem;color:var(--text)">🔄 <strong>Nova versão disponível!</strong></div>
@@ -1013,28 +1010,54 @@ function openShareModal(){
   document.getElementById('share-modal').style.display='flex';
   setTimeout(generateAllCards, 150);
 }
-
 function closeShareModal(){
   document.getElementById('share-modal').style.display='none';
 }
 
-// ── Checkerboard background (Strava style) ──
-function drawChecker(ctx, W, H){
-  var sz=40;
-  for(var y=0;y<H;y+=sz){
-    for(var x=0;x<W;x+=sz){
-      ctx.fillStyle=((Math.floor(x/sz)+Math.floor(y/sz))%2===0)?'#2a2a2a':'#222222';
-      ctx.fillRect(x,y,sz,sz);
-    }
-  }
+// ── Shoe icon (vetorial, sem imagem externa) ──
+function drawShoeIcon(ctx, x, y, size, color){
+  color = color||'#ffffff';
+  ctx.save();
+  ctx.translate(x, y);
+  var s = size/40; // scale factor (design em 40x40)
+  ctx.strokeStyle = color;
+  ctx.fillStyle   = 'transparent';
+  ctx.lineWidth   = 2.5*s;
+  ctx.lineCap     = 'round';
+  ctx.lineJoin    = 'round';
+  // Sole
+  ctx.beginPath();
+  ctx.moveTo(4*s,32*s);
+  ctx.bezierCurveTo(4*s,36*s, 10*s,38*s, 20*s,38*s);
+  ctx.bezierCurveTo(30*s,38*s, 36*s,36*s, 36*s,32*s);
+  ctx.stroke();
+  // Upper body
+  ctx.beginPath();
+  ctx.moveTo(6*s,32*s);
+  ctx.bezierCurveTo(6*s,24*s, 10*s,18*s, 18*s,16*s);
+  ctx.bezierCurveTo(24*s,14*s, 30*s,16*s, 34*s,20*s);
+  ctx.lineTo(36*s,32*s);
+  ctx.stroke();
+  // Laces
+  ctx.beginPath();
+  ctx.moveTo(14*s,20*s); ctx.lineTo(26*s,20*s);
+  ctx.moveTo(13*s,24*s); ctx.lineTo(27*s,24*s);
+  ctx.moveTo(14*s,28*s); ctx.lineTo(28*s,28*s);
+  ctx.stroke();
+  // Tongue/top
+  ctx.beginPath();
+  ctx.moveTo(18*s,16*s);
+  ctx.bezierCurveTo(16*s,10*s, 14*s,6*s, 10*s,4*s);
+  ctx.bezierCurveTo(8*s,2*s, 6*s,4*s, 6*s,8*s);
+  ctx.stroke();
+  ctx.restore();
 }
 
-// ── Draw route on canvas ──
-function drawRouteCanvas(W, H, bgColor, lineColor, lineWidth){
+// ── Draw route ──
+function drawRouteCanvas(W, H, lineColor, lineWidth){
   var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
   var ctx=cv.getContext('2d');
-  if(bgColor==='checker') drawChecker(ctx,W,H);
-  else { ctx.fillStyle=bgColor; ctx.fillRect(0,0,W,H); }
+  // transparent bg
   if(routePoints.length<2) return cv;
   var lats=routePoints.map(function(p){return p.lat;});
   var lngs=routePoints.map(function(p){return p.lng;});
@@ -1045,23 +1068,18 @@ function drawRouteCanvas(W, H, bgColor, lineColor, lineWidth){
   var scaleX=(W-pad*2)/ranLng, scaleY=(H-pad*2)/ranLat;
   var scale=Math.min(scaleX,scaleY);
   var offX=(W-ranLng*scale)/2, offY=(H-ranLat*scale)/2;
-  function proj(p){ return {x:offX+(p.lng-minLng)*scale, y:H-offY-(p.lat-minLat)*scale}; }
+  function proj(p){return {x:offX+(p.lng-minLng)*scale, y:H-offY-(p.lat-minLat)*scale};}
+  var p0=proj(routePoints[0]);
   // glow
-  ctx.save();
-  ctx.beginPath();
-  var p0=proj(routePoints[0]); ctx.moveTo(p0.x,p0.y);
-  routePoints.forEach(function(p){ var pp=proj(p); ctx.lineTo(pp.x,pp.y); });
-  ctx.strokeStyle='rgba(255,107,0,0.3)'; ctx.lineWidth=lineWidth+8; ctx.lineCap='round'; ctx.lineJoin='round';
-  ctx.stroke(); ctx.restore();
-  // main line
   ctx.beginPath(); ctx.moveTo(p0.x,p0.y);
-  routePoints.forEach(function(p){ var pp=proj(p); ctx.lineTo(pp.x,pp.y); });
-  ctx.strokeStyle=lineColor; ctx.lineWidth=lineWidth; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke();
-  // dots
-  var ps=proj(routePoints[0]);
-  ctx.beginPath(); ctx.arc(ps.x,ps.y,lineWidth*2,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
-  var pe=proj(routePoints[routePoints.length-1]);
-  ctx.beginPath(); ctx.arc(pe.x,pe.y,lineWidth*2,0,Math.PI*2); ctx.fillStyle='#ff6b00'; ctx.fill();
+  routePoints.forEach(function(p){var pp=proj(p); ctx.lineTo(pp.x,pp.y);});
+  ctx.strokeStyle='rgba(255,107,0,0.35)'; ctx.lineWidth=lineWidth+8;
+  ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke();
+  // main
+  ctx.beginPath(); ctx.moveTo(p0.x,p0.y);
+  routePoints.forEach(function(p){var pp=proj(p); ctx.lineTo(pp.x,pp.y);});
+  ctx.strokeStyle=lineColor; ctx.lineWidth=lineWidth;
+  ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke();
   return cv;
 }
 
@@ -1069,7 +1087,6 @@ function fmtElapsed(sec){
   var m=Math.floor(sec/60), s=sec%60;
   return m+'min '+(s<10?'0':'')+s+'s';
 }
-
 function getStats(){
   var distKm=totalDist/1000;
   var avgKmh=(elapsed>0&&distKm>0)?(distKm/(elapsed/3600)):0;
@@ -1079,210 +1096,184 @@ function getStats(){
     pace: avgPaceSec>0?secToPace(avgPaceSec)+' /km':'--',
     time: fmtElapsed(elapsed),
     kcal: distKm>0?Math.round(distKm*70*0.95)+' kcal':'--',
-    distKm: distKm, avgPaceSec: avgPaceSec, avgKmh: avgKmh
+    distKm:distKm, avgPaceSec:avgPaceSec, avgKmh:avgKmh
   };
 }
-
 function downloadCanvas(cv, name){
   var a=document.createElement('a');
-  a.download=name||'jacke-run-card.png';
+  a.download=name||'jacke-run.png';
   a.href=cv.toDataURL('image/png'); a.click();
 }
 
-// ── Draw shoe + JACKE RUN header ──
-function drawHeader(ctx, x, y, shoeSize, fontSize){
-  var shoe=document.getElementById('shoe-img-cache');
-  if(shoe&&shoe.complete) ctx.drawImage(shoe, x, y, shoeSize, shoeSize);
-  ctx.fillStyle='#ffffff';
-  ctx.font='bold '+fontSize+'px system-ui,-apple-system,sans-serif';
-  ctx.textAlign='left';
-  ctx.fillText('JACKE RUN', x+shoeSize+14, y+shoeSize*0.72);
-}
-
-// ── Stat block: label small, value big ──
-function drawStat(ctx, label, value, x, y, valSize, lblSize){
-  lblSize=lblSize||24;
+// ── Label + value stat block ──
+function drawStat(ctx, label, value, x, y, valSize, lblSize, align){
+  align=align||'left';
+  lblSize=lblSize||28;
+  ctx.textAlign=align;
   ctx.fillStyle='rgba(255,255,255,0.7)';
-  ctx.font=lblSize+'px system-ui';
-  ctx.textAlign='left';
+  ctx.font='500 '+lblSize+'px system-ui,-apple-system,sans-serif';
   ctx.fillText(label, x, y);
   ctx.fillStyle='#ffffff';
   ctx.font='bold '+valSize+'px system-ui,-apple-system,sans-serif';
-  ctx.fillText(value, x, y+valSize+4);
+  ctx.fillText(value, x, y+valSize+2);
 }
 
 function generateAllCards(){
   var container=document.getElementById('share-cards-container');
   container.innerHTML='';
   var s=getStats();
-
   var cards=[
-    {label:'Card 1 — Horizontal compacto (6 dados)', fn:function(){ return card1Horizontal(s); }},
-    {label:'Card 2 — Horizontal simples (3 dados)', fn:function(){ return card2HorizontalSimple(s); }},
-    {label:'Card 3 — Vertical com mapa', fn:function(){ return card3VerticalMap(s); }},
-    {label:'Card 4 — Vertical grande (Story)', fn:function(){ return card4Story(s); }},
+    {label:'Card 1 — Horizontal compacto (6 dados)', fn:function(){return card1(s);}},
+    {label:'Card 2 — Horizontal simples (3 dados)',  fn:function(){return card2(s);}},
+    {label:'Card 3 — Vertical com mapa',             fn:function(){return card3(s);}},
+    {label:'Card 4 — Vertical story',                fn:function(){return card4(s);}},
   ];
-
-  cards.forEach(function(card, i){
+  cards.forEach(function(card,i){
     var cv=card.fn();
     var lbl=document.createElement('div');
     lbl.className='share-card-label'; lbl.textContent=card.label;
     container.appendChild(lbl);
-
-    var maxW=Math.min(container.offsetWidth||360, 480);
+    var maxW=Math.min(container.offsetWidth||360,480);
     var scale=maxW/cv.width;
-    var display=document.createElement('canvas');
-    display.width=maxW; display.height=Math.round(cv.height*scale);
-    display.style.width='100%'; display.style.borderRadius='12px'; display.style.display='block';
-    display.style.cursor='pointer';
-    display.getContext('2d').drawImage(cv,0,0,display.width,display.height);
-    display.onclick=function(){ downloadCanvas(cv,'jacke-run-card-'+(i+1)+'.png'); };
-
+    // preview on dark bg so transparent areas show nicely
+    var preview=document.createElement('canvas');
+    preview.width=maxW; preview.height=Math.round(cv.height*scale);
+    preview.style.cssText='width:100%;border-radius:12px;display:block;cursor:pointer;background:#1c1c1c';
+    var pCtx=preview.getContext('2d');
+    pCtx.fillStyle='#1c1c1c'; pCtx.fillRect(0,0,preview.width,preview.height);
+    pCtx.drawImage(cv,0,0,preview.width,preview.height);
+    preview.onclick=(function(canvas,idx){
+      return function(){ downloadCanvas(canvas,'jacke-run-card-'+(idx+1)+'.png'); };
+    })(cv,i);
     var wrap=document.createElement('div');
-    wrap.className='share-card-wrap'; wrap.appendChild(display);
-
+    wrap.className='share-card-wrap'; wrap.appendChild(preview);
     var hint=document.createElement('div');
     hint.style.cssText='font-family:"Courier New",monospace;font-size:.6rem;color:var(--muted);text-align:center;margin-top:4px;margin-bottom:8px';
-    hint.textContent='⬇ Toque para baixar PNG';
-
-    container.appendChild(wrap);
-    container.appendChild(hint);
+    hint.textContent='⬇ Toque para baixar PNG (fundo transparente)';
+    container.appendChild(wrap); container.appendChild(hint);
   });
 }
 
-// ── CARD 1: Horizontal compacto — 6 dados (igual Strava img1) ──
-function card1Horizontal(s){
-  var W=1120, H=420;
+// ══ CARD 1: Horizontal compacto — 6 dados ══
+// Igual Strava imagem 1: shoe+nome topo, linha divisória, 6 stats em 2 linhas
+function card1(s){
+  var W=1120, H=430;
   var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
   var ctx=cv.getContext('2d');
-  drawChecker(ctx,W,H);
+  // transparent background — nothing drawn
 
-  // header
-  drawHeader(ctx, 40, 30, 70, 52);
+  // header: shoe icon + JACKE RUN
+  drawShoeIcon(ctx, 40, 22, 68, '#ffffff');
+  ctx.fillStyle='#ffffff';
+  ctx.font='bold 54px system-ui,-apple-system,sans-serif';
+  ctx.textAlign='left';
+  ctx.fillText('JACKE RUN', 120, 72);
 
   // divider
-  ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.fillRect(40,120,W-80,1);
+  ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.fillRect(40,108,W-80,1);
 
-  // 6 stats in 2 rows x 3 cols
+  // 6 stats: 3 per row
   var stats=[
-    {lbl:'Distância', val:s.dist},
-    {lbl:'Ritmo', val:s.pace},
-    {lbl:'Cal', val:s.kcal},
-    {lbl:'Tempo', val:s.time},
-    {lbl:'Km/h', val:s.avgKmh>0?s.avgKmh.toFixed(1)+' km/h':'--'},
+    {lbl:'Distância',val:s.dist},
+    {lbl:'Ritmo',    val:s.pace},
+    {lbl:'Cal',      val:s.kcal},
+    {lbl:'Tempo',    val:s.time},
+    {lbl:'Vel. média',val:s.avgKmh>0?s.avgKmh.toFixed(1)+' km/h':'--'},
     {lbl:'Parciais', val:kmSplits.length>0?kmSplits.length+' km':'--'},
-  ];
-  var colW=W/3, rowH=140;
-  stats.forEach(function(st,i){
-    var col=i%3, row=Math.floor(i/3);
-    drawStat(ctx, st.lbl, st.val, 40+col*colW, 140+row*rowH, 58, 26);
-  });
-
-  // vertical dividers
-  ctx.fillStyle='rgba(255,255,255,0.1)';
-  [1,2].forEach(function(i){ ctx.fillRect(i*colW,125,1,H-140); });
-
-  return cv;
-}
-
-// ── CARD 2: Horizontal simples — 3 dados (igual Strava img2) ──
-function card2HorizontalSimple(s){
-  var W=1120, H=320;
-  var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
-  var ctx=cv.getContext('2d');
-  drawChecker(ctx,W,H);
-
-  drawHeader(ctx, 40, 28, 64, 48);
-
-  ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.fillRect(40,108,W-80,1);
-
-  var stats=[
-    {lbl:'Distância', val:s.dist},
-    {lbl:'Ritmo', val:s.pace},
-    {lbl:'Tempo', val:s.time},
   ];
   var colW=W/3;
   stats.forEach(function(st,i){
-    drawStat(ctx, st.lbl, st.val, 40+i*colW, 124, 62, 26);
+    var col=i%3, row=Math.floor(i/3);
+    drawStat(ctx, st.lbl, st.val, 40+col*colW, 128+row*148, 64, 28);
   });
-
-  ctx.fillStyle='rgba(255,255,255,0.1)';
+  // vertical dividers
+  ctx.fillStyle='rgba(255,255,255,0.15)';
   [1,2].forEach(function(i){ ctx.fillRect(i*colW,112,1,H-118); });
-
   return cv;
 }
 
-// ── CARD 3: Vertical com mapa grande em cima (igual Strava img3) ──
-function card3VerticalMap(s){
-  var W=560, H=780;
+// ══ CARD 2: Horizontal simples — 3 dados ══
+function card2(s){
+  var W=1120, H=310;
   var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
   var ctx=cv.getContext('2d');
-  drawChecker(ctx,W,H);
 
-  // route map (top 55%)
-  var mapH=Math.round(H*0.52);
-  var routeCV=drawRouteCanvas(W, mapH, 'checker', '#ff6b00', 6);
-  ctx.drawImage(routeCV,0,0);
+  drawShoeIcon(ctx, 40, 20, 62, '#ffffff');
+  ctx.fillStyle='#ffffff';
+  ctx.font='bold 50px system-ui,-apple-system,sans-serif';
+  ctx.textAlign='left';
+  ctx.fillText('JACKE RUN', 116, 66);
 
-  // divider
-  ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.fillRect(30,mapH+10,W-60,1);
+  ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.fillRect(40,100,W-80,1);
 
-  // JACKE RUN centered
-  var shoe=document.getElementById('shoe-img-cache');
-  var sz=52;
-  ctx.font='bold 44px system-ui';
-  var tw=ctx.measureText('JACKE RUN').width;
-  var gx=(W-(sz+12+tw))/2;
-  if(shoe&&shoe.complete) ctx.drawImage(shoe,gx,mapH+22,sz,sz);
-  ctx.fillStyle='#fff'; ctx.textAlign='left';
-  ctx.fillText('JACKE RUN', gx+sz+12, mapH+22+sz*0.72);
+  var stats=[{lbl:'Distância',val:s.dist},{lbl:'Ritmo',val:s.pace},{lbl:'Tempo',val:s.time}];
+  var colW=W/3;
+  stats.forEach(function(st,i){
+    drawStat(ctx, st.lbl, st.val, 40+i*colW, 118, 68, 28);
+  });
+  ctx.fillStyle='rgba(255,255,255,0.15)';
+  [1,2].forEach(function(i){ ctx.fillRect(i*colW,104,1,H-110); });
+  return cv;
+}
+
+// ══ CARD 3: Vertical com mapa ══
+function card3(s){
+  var W=560, H=820;
+  var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  var ctx=cv.getContext('2d');
+
+  // route map top area
+  var mapH=420;
+  var routeCV=drawRouteCanvas(W, mapH, '#ff6b00', 7);
+  ctx.drawImage(routeCV, 0, 0);
+
+  // JACKE RUN centered below map
+  ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.fillRect(30,mapH+12,W-60,1);
+  drawShoeIcon(ctx,(W/2)-110, mapH+24, 52, '#ffffff');
+  ctx.fillStyle='#ffffff'; ctx.font='bold 46px system-ui'; ctx.textAlign='left';
+  ctx.fillText('JACKE RUN', W/2-110+62, mapH+62);
+
+  ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.fillRect(30,mapH+90,W-60,1);
 
   // 3 stats
   var stats=[{lbl:'Distância',val:s.dist},{lbl:'Ritmo',val:s.pace},{lbl:'Tempo',val:s.time}];
   var colW=W/3;
-  ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.fillRect(30,mapH+90,W-60,1);
   stats.forEach(function(st,i){
-    drawStat(ctx, st.lbl, st.val, 24+i*colW, mapH+104, 54, 24);
+    drawStat(ctx, st.lbl, st.val, 20+i*colW, mapH+106, 60, 24);
   });
-  [1,2].forEach(function(i){ ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.fillRect(i*colW,mapH+94,1,H-mapH-100); });
-
+  ctx.fillStyle='rgba(255,255,255,0.12)';
+  [1,2].forEach(function(i){ ctx.fillRect(i*colW,mapH+94,1,H-mapH-100); });
   return cv;
 }
 
-// ── CARD 4: Vertical story — dados em cima, mapa embaixo (igual Strava img4) ──
-function card4Story(s){
-  var W=560, H=980;
+// ══ CARD 4: Vertical story — stats empilhados + mapa ══
+function card4(s){
+  var W=560, H=1000;
   var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
   var ctx=cv.getContext('2d');
-  drawChecker(ctx,W,H);
 
   // 3 big stats stacked
   var stats=[{lbl:'Distância',val:s.dist},{lbl:'Ritmo',val:s.pace},{lbl:'Tempo',val:s.time}];
-  var y=50;
+  var y=40;
   stats.forEach(function(st){
-    ctx.fillStyle='rgba(255,255,255,0.65)'; ctx.font='bold 28px system-ui'; ctx.textAlign='center';
-    ctx.fillText(st.lbl, W/2, y);
-    ctx.fillStyle='#ffffff'; ctx.font='bold 88px system-ui,-apple-system,sans-serif';
-    ctx.fillText(st.val, W/2, y+96);
-    y+=156;
-    ctx.fillStyle='rgba(255,255,255,0.08)'; ctx.fillRect(30,y,W-60,1);
-    y+=16;
+    ctx.fillStyle='rgba(255,255,255,0.65)'; ctx.font='bold 30px system-ui'; ctx.textAlign='center';
+    ctx.fillText(st.lbl, W/2, y+30);
+    ctx.fillStyle='#ffffff'; ctx.font='bold 96px system-ui,-apple-system,sans-serif';
+    ctx.fillText(st.val, W/2, y+136);
+    y+=178;
+    ctx.fillStyle='rgba(255,255,255,0.15)'; ctx.fillRect(40,y,W-80,1);
+    y+=18;
   });
 
-  // map
-  var mapY=y+10, mapH=H-mapY-80;
-  var routeCV=drawRouteCanvas(W-60, mapH, 'checker', '#ff6b00', 5);
+  // route map
+  var mapY=y+12, mapH=H-mapY-80;
+  var routeCV=drawRouteCanvas(W-60, mapH, '#ff6b00', 5);
   ctx.drawImage(routeCV, 30, mapY);
 
-  // JACKE RUN footer
-  var shoe=document.getElementById('shoe-img-cache');
-  var sz=44; var fy=H-54;
-  ctx.font='bold 38px system-ui'; var tw=ctx.measureText('JACKE RUN').width;
-  var gx=(W-(sz+10+tw))/2;
-  if(shoe&&shoe.complete) ctx.drawImage(shoe,gx,fy,sz,sz);
-  ctx.fillStyle='#fff'; ctx.textAlign='left';
-  ctx.fillText('JACKE RUN', gx+sz+10, fy+sz*0.72);
-
+  // JACKE RUN footer centered
+  drawShoeIcon(ctx,(W/2)-100, H-68, 48, '#ffffff');
+  ctx.fillStyle='#ffffff'; ctx.font='bold 40px system-ui'; ctx.textAlign='left';
+  ctx.fillText('JACKE RUN', W/2-100+58, H-68+36);
   return cv;
 }
 

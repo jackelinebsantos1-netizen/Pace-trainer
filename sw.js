@@ -1,5 +1,5 @@
 // Mude este número toda vez que atualizar o app
-const CACHE = 'jacke-run-v6';
+const CACHE = 'jacke-run-v7';
 const FILES = ['./index.html', './manifest.json', './corrida.png'];
 
 self.addEventListener('install', e => {
