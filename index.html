@@ -533,9 +533,23 @@ function requestGPS(){
   );
 }
 function startGPSWatch(){
-  if(!navigator.geolocation||!gpsReady) return;
+  if(!navigator.geolocation) return;
   prevPos=null; prevTime=null;
-  watchId=navigator.geolocation.watchPosition(onGPS,function(){},{enableHighAccuracy:true,maximumAge:1000,timeout:10000});
+  // Pede permissão automaticamente ao iniciar o treino
+  watchId=navigator.geolocation.watchPosition(
+    onGPS,
+    function(err){
+      // Atualiza banner de GPS com erro
+      var dot=document.getElementById('setup-gps-dot');
+      var txt=document.getElementById('setup-gps-text');
+      if(dot) dot.className='gps-dot err';
+      if(txt) txt.textContent='GPS negado — distância não disponível';
+      addLog('⚠ GPS indisponível: distância não será registrada','warning');
+    },
+    {enableHighAccuracy:true, maximumAge:1000, timeout:15000}
+  );
+  // Marca como ativo para o botão da tela inicial refletir
+  gpsReady=true;
 }
 function stopGPSWatch(){ if(watchId!==null){ navigator.geolocation.clearWatch(watchId); watchId=null; } }
 function onGPS(pos){
@@ -548,7 +562,7 @@ function onGPS(pos){
     var dLon=(pos.coords.longitude-prevPos.coords.longitude)*Math.PI/180;
     var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)*Math.sin(dLon/2);
     var dist=R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)),spd=dist/dt;
-    if(spd>0.8){
+    if(spd>0.3){
       totalDist+=dist;
       routePoints.push({lat:pos.coords.latitude,lng:pos.coords.longitude,t:now});
       // km split detection
@@ -637,6 +651,8 @@ function startWorkout(){
   document.getElementById('setup-view').style.display='none';
   document.getElementById('running-view').classList.add('active');
   document.getElementById('finish-modal').style.display='none';
+  document.getElementById('splits-wrap').style.display='none';
+  document.getElementById('splits-tbody').innerHTML='';
   document.getElementById('log').innerHTML='';
   document.getElementById('dist-val').textContent='0.00 km';
   document.getElementById('avg-spd-val').textContent='-- km/h';
@@ -715,6 +731,8 @@ function updateRunUI(){
   document.getElementById('prog-fill').style.width=tprog+'%';
   document.getElementById('prog-pct').textContent=Math.round(tprog)+'%';
   document.getElementById('pm-target').textContent='Alvo: '+block.pace+' /km';
+  // Atualiza distância a cada segundo na tela
+  document.getElementById('dist-val').textContent=(totalDist/1000).toFixed(2)+' km';
   if(totalDist>0&&elapsed>0){
     var avgKmh=((totalDist/1000)/(elapsed/3600)).toFixed(1);
     document.getElementById('avg-spd-val').textContent=avgKmh+' km/h';
@@ -759,9 +777,11 @@ function showFinish(completed){
       kmSplits.push({ km: '+' + (remDist/1000).toFixed(1), paceStr: secToPace(remPace), paceSec: remPace });
     }
   }
+  renderSplits();
   document.getElementById('finish-modal').style.display='flex';
   if(distKm>0) falar('Distância percorrida: '+distKm.toFixed(2)+' quilômetros. Velocidade média: '+avgKmh.toFixed(1)+' quilômetros por hora.');
-  setTimeout(function(){ renderRouteMap(); renderSplits(); initFlyover(); }, 120);
+  saveCurrentActivity(completed);
+  setTimeout(function(){ renderRouteMap(); initFlyover(); }, 150);
 }
 
 function renderSplits(){
@@ -826,6 +846,8 @@ function renderSplits(){
   });
 
   wrap.style.display = 'block';
+  // Force reflow so bars animate correctly
+  wrap.offsetHeight;
 }
 
 function initFlyover(){
@@ -1146,7 +1168,8 @@ function generateAllCards(){
     pCtx.fillStyle='#1c1c1c'; pCtx.fillRect(0,0,preview.width,preview.height);
     pCtx.drawImage(cv,0,0,preview.width,preview.height);
     preview.onclick=(function(canvas,idx){
-      return function(){ downloadCanvas(canvas,'jacke-run-card-'+(idx+1)+'.png'); };
+      return function(){ var names=['jacke-run-horizontal-completo.png','jacke-run-horizontal-simples.png','jacke-run-vertical-mapa.png','jacke-run-story.png'];
+        downloadCanvas(canvas, names[idx]||('jacke-run-card-'+(idx+1)+'.png')); };
     })(cv,i);
     var wrap=document.createElement('div');
     wrap.className='share-card-wrap'; wrap.appendChild(preview);
@@ -1241,52 +1264,63 @@ function card2(s){
 }
 
 // ══ CARD 3: Vertical com mapa ══
-// Mapa topo, JACKE RUN centralizado, 3 stats menores SEM linhas
 function card3(s){
-  var W=560, H=820;
+  // Layout planejado:
+  // 0..340   = mapa
+  // 340..410 = tênis + JACKE RUN (70px)
+  // 410..420 = espaço
+  // 420..450 = labels (30px)
+  // 450..510 = valores (60px)
+  // total    = 520px
+  var W=560, H=540;
   var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
   var ctx=cv.getContext('2d');
 
-  // Mapa no topo
-  var mapH = 390;
-  var routeCV = drawRouteCanvas(W, mapH, '#ff6b00', 6);
+  // ── Mapa ──
+  var mapH = 310;
+  var routeCV = drawRouteCanvas(W, mapH, '#ff6b00', 5);
   ctx.drawImage(routeCV, 0, 0);
 
-  // Linha separadora
-  ctx.fillStyle = 'rgba(255,255,255,0.2)';
-
-  // Tênis + JACKE RUN centralizado
-  var shoeSize = 50;
-  ctx.font = 'bold 42px system-ui,-apple-system,sans-serif';
+  // ── Tênis + JACKE RUN centralizado ──
+  var shoeSize = 44;
+  var headerY  = mapH + 18;
+  ctx.font = 'bold 38px system-ui,-apple-system,sans-serif';
   var tw   = ctx.measureText('JACKE RUN').width;
-  var gap  = 12;
-  var groupW = shoeSize + gap + tw;
-  var gx   = (W - groupW) / 2;
-  drawShoeIcon(ctx, gx, mapH + 24, shoeSize, '#ffffff');
+  var gx   = (W - (shoeSize + 10 + tw)) / 2;
+  drawShoeIcon(ctx, gx, headerY, shoeSize, '#ffffff');
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'left';
-  ctx.fillText('JACKE RUN', gx + shoeSize + gap, mapH + 24 + shoeSize * 0.72);
+  ctx.fillText('JACKE RUN', gx + shoeSize + 10, headerY + shoeSize * 0.75);
 
-  // Linha separadora
-  ctx.fillStyle = 'rgba(255,255,255,0.2)';
-
-  // 3 stats — fonte menor para não sobrepor, SEM linhas verticais
-  var stats=[
+  // ── 3 stats — cada um em coluna própria ──
+  var stats = [
     {lbl:'Distância', val:s.dist},
     {lbl:'Ritmo',     val:s.pace},
     {lbl:'Tempo',     val:s.time},
   ];
-  var colW = W / 3;
+  var colW   = W / 3;
+  var lblY   = mapH + 86;   // y do label
+  var valY   = mapH + 116;  // y do valor (label 22px + espaço 8px)
+
   stats.forEach(function(st, i){
-    var x = 16 + i * colW;
-    var y = mapH + 108;
+    var x = 14 + i * colW;
+
+    // label
     ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    ctx.font      = '20px system-ui,-apple-system,sans-serif';
+    ctx.font      = '500 22px system-ui,-apple-system,sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(st.lbl, x, y);
+    ctx.fillText(st.lbl, x, lblY);
+
+    // valor — tamanho dinâmico para caber na coluna
+    // colW ≈ 186px, texto não pode ultrapassar isso
+    var valFont = 46;
+    ctx.font = 'bold '+valFont+'px system-ui,-apple-system,sans-serif';
+    while(ctx.measureText(st.val).width > colW - 20 && valFont > 24){
+      valFont -= 2;
+      ctx.font = 'bold '+valFont+'px system-ui,-apple-system,sans-serif';
+    }
     ctx.fillStyle = '#ffffff';
-    ctx.font      = 'bold 44px system-ui,-apple-system,sans-serif';
-    ctx.fillText(st.val, x, y + 50);
+    ctx.fillText(st.val, x, valY + valFont);
   });
 
   return cv;
