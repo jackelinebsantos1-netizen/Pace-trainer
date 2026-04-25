@@ -1,6 +1,6 @@
 // Mude este número toda vez que atualizar o app
-const CACHE = 'jacke-run-v8';
-const FILES = ['./index.html', './manifest.json', './corrida.png'];
+const CACHE = 'jacke-run-v10';
+const FILES = ['/Pace-trainer/', '/Pace-trainer/index.html', '/Pace-trainer/manifest.json', '/Pace-trainer/corrida.png', '/Pace-trainer/icon-192.png', '/Pace-trainer/icon-512.png'];
 
 self.addEventListener('install', e => {
   // Força instalação imediata sem esperar aba fechar
@@ -20,7 +20,7 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   // Network first para o index.html — sempre busca versão mais nova
-  if(e.request.url.endsWith('index.html') || e.request.url.endsWith('/')) {
+  if(e.request.url.endsWith('index.html') || e.request.url.endsWith('/Pace-trainer/') || e.request.url.endsWith('/')) {
     e.respondWith(
       fetch(e.request)
         .then(res => {

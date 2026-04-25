@@ -163,19 +163,19 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .finish-stat-lbl{font-family:'Courier New',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.15em;color:var(--muted)}
 
 /* SPLITS TABLE */
-.splits-wrap{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.splits-title{font-family:"Courier New",monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);padding:10px 14px 6px}
-.splits-table{width:100%;border-collapse:collapse}
-.splits-table th{font-family:"Courier New",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);padding:4px 14px 6px;text-align:left;border-bottom:1px solid var(--border)}
+
+
+
+
 .splits-table th:last-child{text-align:right}
-.splits-table td{padding:5px 14px;font-family:"Courier New",monospace;font-size:.82rem;color:var(--text);vertical-align:middle}
+
 .splits-table td:last-child{text-align:right;color:var(--muted);font-size:.75rem}
-.splits-table tr:not(:last-child) td{border-bottom:1px solid rgba(255,255,255,.04)}
-.split-bar-cell{width:55%;padding:5px 14px 5px 0}
-.split-bar-bg{background:var(--surface2);border-radius:20px;height:14px;overflow:hidden}
-.split-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s ease}
-.split-km{font-weight:700;color:var(--muted);font-size:.78rem;min-width:28px}
-.split-pace{color:var(--text);min-width:48px}
+
+
+
+
+
+
 
 /* FLYOVER */
 .flyover-wrap{width:100%;max-width:420px;border-radius:12px;overflow:hidden;border:1px solid var(--border);display:none}
@@ -194,13 +194,25 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 .flyover-status{font-family:"Courier New",monospace;font-size:.65rem;color:var(--muted);margin-left:auto}
 
 /* SHARE CARDS */
+/* SPLITS */
+.splits-wrap{width:100%;max-width:480px;background:var(--surface);border-radius:14px;padding:20px 16px 8px}
+
 .share-card-wrap { position:relative; cursor:pointer; border-radius:16px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,.6); transition:transform .15s; }
+/* SPLITS */
+.splits-wrap{width:100%;max-width:480px;background:var(--surface);border-radius:14px;padding:20px 16px 8px}
+
 .share-card-wrap:active { transform:scale(0.97); }
 .share-card-label { font-family:"Courier New",monospace; font-size:.62rem; color:var(--muted); text-transform:uppercase; letter-spacing:.15em; margin-bottom:6px; }
 .share-card-download { position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,.6); color:#fff; border:none; border-radius:8px; padding:6px 12px; font-size:.72rem; font-weight:700; cursor:pointer; backdrop-filter:blur(4px); }
 
 @media(max-width:420px){/* SHARE CARDS */
+/* SPLITS */
+.splits-wrap{width:100%;max-width:480px;background:var(--surface);border-radius:14px;padding:20px 16px 8px}
+
 .share-card-wrap { position:relative; cursor:pointer; border-radius:16px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,.6); transition:transform .15s; }
+/* SPLITS */
+.splits-wrap{width:100%;max-width:480px;background:var(--surface);border-radius:14px;padding:20px 16px 8px}
+
 .share-card-wrap:active { transform:scale(0.97); }
 .share-card-label { font-family:"Courier New",monospace; font-size:.62rem; color:var(--muted); text-transform:uppercase; letter-spacing:.15em; margin-bottom:6px; }
 .share-card-download { position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,.6); color:#fff; border:none; border-radius:8px; padding:6px 12px; font-size:.72rem; font-weight:700; cursor:pointer; backdrop-filter:blur(4px); }
@@ -264,12 +276,14 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
   <div id="finish-map-wrap" style="width:100%;max-width:480px;border-radius:12px;overflow:hidden;border:1px solid var(--border);display:none">
     <div id="finish-map" style="width:100%;height:220px;background:var(--surface2)"></div>
   </div>
-  <div class="splits-wrap" id="splits-wrap" style="width:100%;max-width:480px;display:none">
-    <div class="splits-title">Parciais por km</div>
-    <table class="splits-table">
-      <thead><tr><th>Km</th><th>Ritmo</th><th></th></tr></thead>
-      <tbody id="splits-tbody"></tbody>
-    </table>
+  <div id="splits-wrap" style="width:100%;max-width:480px;display:none;background:var(--surface);border-radius:14px;padding:20px 16px 8px;overflow:hidden">
+    <div style="font-size:1.6rem;font-weight:900;color:var(--text);margin-bottom:18px;letter-spacing:-.01em">Parciais</div>
+    <div style="display:flex;gap:0;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.15);margin-bottom:4px">
+      <div style="width:52px;font-family:'Courier New',monospace;font-size:.78rem;color:var(--muted)">Km</div>
+      <div style="width:76px;font-family:'Courier New',monospace;font-size:.78rem;color:var(--muted)">Ritmo</div>
+      <div style="flex:1"></div>
+    </div>
+    <div id="splits-tbody"></div>
   </div>
 
   <div class="flyover-wrap" id="flyover-wrap" style="width:100%;max-width:480px">
@@ -751,52 +765,64 @@ function showFinish(completed){
 }
 
 function renderSplits(){
-  var wrap = document.getElementById('splits-wrap');
-  var tbody = document.getElementById('splits-tbody');
+  var wrap   = document.getElementById('splits-wrap');
+  var tbody  = document.getElementById('splits-tbody');
 
-  // ── Fallback: estimate splits from block config if no GPS data ──
+  // ── Fallback: estimate splits from block config if no GPS ──
   if(kmSplits.length === 0){
     var est = [];
     blocks.forEach(function(b){
       if(!paceValid(b.pace)) return;
-      var paceSec  = paceToSec(b.pace);
-      var distKm   = (b.duration * 60) / paceSec;
-      var full     = Math.floor(distKm);
-      for(var k = 0; k < full; k++){
-        est.push({ km: est.length + 1, paceStr: b.pace, paceSec: paceSec });
+      var paceSec = paceToSec(b.pace);
+      var distKm  = (b.duration * 60) / paceSec;
+      var full    = Math.floor(distKm);
+      for(var k=0; k<full; k++){
+        est.push({km: est.length+1, paceStr: b.pace, paceSec: paceSec});
       }
       var rem = distKm - full;
-      if(rem > 0.05){
-        est.push({ km: '+' + rem.toFixed(1), paceStr: b.pace, paceSec: paceSec });
-      }
+      if(rem > 0.05) est.push({km: '+'+rem.toFixed(1), paceStr: b.pace, paceSec: paceSec});
     });
     if(est.length > 0) kmSplits = est;
   }
 
-  if(kmSplits.length === 0){
-    wrap.style.display = 'none';
-    return;
-  }
+  if(kmSplits.length === 0){ wrap.style.display='none'; return; }
 
-  // ── Render table ──
   var paces   = kmSplits.map(function(s){ return s.paceSec; });
   var fastest = Math.min.apply(null, paces);
   var slowest = Math.max.apply(null, paces);
   var range   = slowest - fastest || 1;
 
   tbody.innerHTML = '';
+
   kmSplits.forEach(function(s){
-    var barPct = Math.round(20 + 80 * ((slowest - s.paceSec) / range));
-    var tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td class="split-km">' + s.km + '</td>' +
-      '<td class="split-pace">' + s.paceStr + '</td>' +
-      '<td class="split-bar-cell">' +
-        '<div class="split-bar-bg">' +
-          '<div class="split-bar-fill" style="width:' + barPct + '%"></div>' +
-        '</div>' +
-      '</td>';
-    tbody.appendChild(tr);
+    // bar width: fastest km = 100%, slowest = 30%
+    var barPct = Math.round(30 + 70 * ((slowest - s.paceSec) / range));
+
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)';
+
+    // Km number
+    var kmEl = document.createElement('div');
+    kmEl.style.cssText = 'width:52px;font-size:.95rem;font-weight:700;color:var(--text);font-family:"Courier New",monospace;flex-shrink:0';
+    kmEl.textContent = s.km;
+
+    // Pace
+    var paceEl = document.createElement('div');
+    paceEl.style.cssText = 'width:76px;font-size:.95rem;color:var(--text);font-family:"Courier New",monospace;flex-shrink:0';
+    paceEl.textContent = s.paceStr;
+
+    // Bar container
+    var barWrap = document.createElement('div');
+    barWrap.style.cssText = 'flex:1;padding-right:8px';
+
+    var bar = document.createElement('div');
+    bar.style.cssText = 'height:28px;border-radius:6px;background:#3b82f6;width:'+barPct+'%;transition:width .6s ease';
+
+    barWrap.appendChild(bar);
+    row.appendChild(kmEl);
+    row.appendChild(paceEl);
+    row.appendChild(barWrap);
+    tbody.appendChild(row);
   });
 
   wrap.style.display = 'block';
@@ -1021,17 +1047,13 @@ function closeShareModal(){
 function drawShoeIcon(ctx, x, y, size, color){
   var img = document.getElementById('shoe-img-cache');
   if(img && img.complete && img.naturalWidth > 0){
-    // imagem tem proporção ~98x109, calcular altura proporcional
+    // imagem corrida.png é ~quadrada, desenhar proporcional
     var ratio = img.naturalHeight / img.naturalWidth;
-    ctx.drawImage(img, x, y, size, size * ratio);
-  } else {
-    // fallback: círculo simples se imagem não carregou
-    ctx.beginPath();
-    ctx.arc(x + size/2, y + size/2, size/2, 0, Math.PI*2);
-    ctx.strokeStyle = color||'#ffffff';
-    ctx.lineWidth = size/12;
-    ctx.stroke();
+    var drawW = size;
+    var drawH = size * ratio;
+    ctx.drawImage(img, x, y, drawW, drawH);
   }
+  // sem fallback — se não carregou só pula o ícone
 }
 
 // ── Draw route ──
@@ -1136,125 +1158,189 @@ function generateAllCards(){
 }
 
 // ══ CARD 1: Horizontal compacto — 6 dados ══
-// Igual Strava imagem 1: shoe+nome topo, linha divisória, 6 stats em 2 linhas
+// Tênis+nome topo, linha divisória, 6 stats 2 linhas, SEM linhas verticais
 function card1(s){
-  var W=1120, H=430;
+  var W=1120, H=460;
   var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
   var ctx=cv.getContext('2d');
-  // transparent background — nothing drawn
 
-  // header: shoe icon + JACKE RUN
-  drawShoeIcon(ctx, 40, 22, 68, '#ffffff');
+  // Cabeçalho: tênis + JACKE RUN
+  drawShoeIcon(ctx, 40, 18, 72, '#ffffff');
   ctx.fillStyle='#ffffff';
-  ctx.font='bold 54px system-ui,-apple-system,sans-serif';
+  ctx.font='bold 56px system-ui,-apple-system,sans-serif';
   ctx.textAlign='left';
-  ctx.fillText('JACKE RUN', 120, 72);
+  ctx.fillText('JACKE RUN', 130, 72);
 
-  // divider
-  ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.fillRect(40,108,W-80,1);
+  // Linha divisória horizontal (apenas 1, abaixo do header)
+  ctx.fillStyle='rgba(255,255,255,0.2)';
 
-  // 6 stats: 3 per row
+  // 6 stats: 3 colunas x 2 linhas — SEM linhas verticais entre elas
   var stats=[
-    {lbl:'Distância',val:s.dist},
-    {lbl:'Ritmo',    val:s.pace},
-    {lbl:'Cal',      val:s.kcal},
-    {lbl:'Tempo',    val:s.time},
+    {lbl:'Distância', val:s.dist},
+    {lbl:'Ritmo',     val:s.pace},
+    {lbl:'Cal',       val:s.kcal},
+    {lbl:'Tempo',     val:s.time},
     {lbl:'Vel. média',val:s.avgKmh>0?s.avgKmh.toFixed(1)+' km/h':'--'},
-    {lbl:'Parciais', val:kmSplits.length>0?kmSplits.length+' km':'--'},
+    {lbl:'Parciais',  val:kmSplits.length>0?kmSplits.length+' km':'--'},
   ];
-  var colW=W/3;
-  stats.forEach(function(st,i){
-    var col=i%3, row=Math.floor(i/3);
-    drawStat(ctx, st.lbl, st.val, 40+col*colW, 128+row*148, 64, 28);
+  var colW = W/3;
+  var rowH  = 158;
+  stats.forEach(function(st, i){
+    var col = i % 3;
+    var row = Math.floor(i / 3);
+    var x   = 40 + col * colW;
+    var y   = 126 + row * rowH;
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font      = '26px system-ui,-apple-system,sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(st.lbl, x, y);
+    ctx.fillStyle = '#ffffff';
+    ctx.font      = 'bold 68px system-ui,-apple-system,sans-serif';
+    ctx.fillText(st.val, x, y + 76);
   });
-  // vertical dividers
-  ctx.fillStyle='rgba(255,255,255,0.15)';
-  [1,2].forEach(function(i){ ctx.fillRect(i*colW,112,1,H-118); });
+
   return cv;
 }
 
 // ══ CARD 2: Horizontal simples — 3 dados ══
+// SEM linhas verticais entre colunas, SEM linha horizontal acima dos dados
 function card2(s){
-  var W=1120, H=310;
+  var W=1120, H=280;
   var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
   var ctx=cv.getContext('2d');
 
-  drawShoeIcon(ctx, 40, 20, 62, '#ffffff');
-  ctx.fillStyle='#ffffff';
-  ctx.font='bold 50px system-ui,-apple-system,sans-serif';
-  ctx.textAlign='left';
-  ctx.fillText('JACKE RUN', 116, 66);
+  // Header
+  drawShoeIcon(ctx, 40, 16, 64, '#ffffff');
+  ctx.fillStyle = '#ffffff';
+  ctx.font      = 'bold 52px system-ui,-apple-system,sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('JACKE RUN', 120, 66);
 
-  ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.fillRect(40,100,W-80,1);
+  // Linha divisória (apenas 1)
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
 
-  var stats=[{lbl:'Distância',val:s.dist},{lbl:'Ritmo',val:s.pace},{lbl:'Tempo',val:s.time}];
-  var colW=W/3;
-  stats.forEach(function(st,i){
-    drawStat(ctx, st.lbl, st.val, 40+i*colW, 118, 68, 28);
+  // 3 stats numa linha — SEM linhas verticais
+  var stats=[
+    {lbl:'Distância', val:s.dist},
+    {lbl:'Ritmo',     val:s.pace},
+    {lbl:'Tempo',     val:s.time},
+  ];
+  var colW = W / 3;
+  stats.forEach(function(st, i){
+    var x = 40 + i * colW;
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font      = '26px system-ui,-apple-system,sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(st.lbl, x, 124);
+    ctx.fillStyle = '#ffffff';
+    ctx.font      = 'bold 72px system-ui,-apple-system,sans-serif';
+    ctx.fillText(st.val, x, 210);
   });
-  ctx.fillStyle='rgba(255,255,255,0.15)';
-  [1,2].forEach(function(i){ ctx.fillRect(i*colW,104,1,H-110); });
+
   return cv;
 }
 
 // ══ CARD 3: Vertical com mapa ══
+// Mapa topo, JACKE RUN centralizado, 3 stats menores SEM linhas
 function card3(s){
   var W=560, H=820;
   var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
   var ctx=cv.getContext('2d');
 
-  // route map top area
-  var mapH=420;
-  var routeCV=drawRouteCanvas(W, mapH, '#ff6b00', 7);
+  // Mapa no topo
+  var mapH = 390;
+  var routeCV = drawRouteCanvas(W, mapH, '#ff6b00', 6);
   ctx.drawImage(routeCV, 0, 0);
 
-  // JACKE RUN centered below map
-  ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.fillRect(30,mapH+12,W-60,1);
-  drawShoeIcon(ctx,(W/2)-110, mapH+24, 52, '#ffffff');
-  ctx.fillStyle='#ffffff'; ctx.font='bold 46px system-ui'; ctx.textAlign='left';
-  ctx.fillText('JACKE RUN', W/2-110+62, mapH+62);
+  // Linha separadora
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
 
-  ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.fillRect(30,mapH+90,W-60,1);
+  // Tênis + JACKE RUN centralizado
+  var shoeSize = 50;
+  ctx.font = 'bold 42px system-ui,-apple-system,sans-serif';
+  var tw   = ctx.measureText('JACKE RUN').width;
+  var gap  = 12;
+  var groupW = shoeSize + gap + tw;
+  var gx   = (W - groupW) / 2;
+  drawShoeIcon(ctx, gx, mapH + 24, shoeSize, '#ffffff');
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'left';
+  ctx.fillText('JACKE RUN', gx + shoeSize + gap, mapH + 24 + shoeSize * 0.72);
 
-  // 3 stats
-  var stats=[{lbl:'Distância',val:s.dist},{lbl:'Ritmo',val:s.pace},{lbl:'Tempo',val:s.time}];
-  var colW=W/3;
-  stats.forEach(function(st,i){
-    drawStat(ctx, st.lbl, st.val, 20+i*colW, mapH+106, 60, 24);
+  // Linha separadora
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+
+  // 3 stats — fonte menor para não sobrepor, SEM linhas verticais
+  var stats=[
+    {lbl:'Distância', val:s.dist},
+    {lbl:'Ritmo',     val:s.pace},
+    {lbl:'Tempo',     val:s.time},
+  ];
+  var colW = W / 3;
+  stats.forEach(function(st, i){
+    var x = 16 + i * colW;
+    var y = mapH + 108;
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font      = '20px system-ui,-apple-system,sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(st.lbl, x, y);
+    ctx.fillStyle = '#ffffff';
+    ctx.font      = 'bold 44px system-ui,-apple-system,sans-serif';
+    ctx.fillText(st.val, x, y + 50);
   });
-  ctx.fillStyle='rgba(255,255,255,0.12)';
-  [1,2].forEach(function(i){ ctx.fillRect(i*colW,mapH+94,1,H-mapH-100); });
+
   return cv;
 }
 
 // ══ CARD 4: Vertical story — stats empilhados + mapa ══
+// Stats grandes centralizados, SEM linhas verticais laterais
 function card4(s){
   var W=560, H=1000;
   var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
   var ctx=cv.getContext('2d');
 
-  // 3 big stats stacked
-  var stats=[{lbl:'Distância',val:s.dist},{lbl:'Ritmo',val:s.pace},{lbl:'Tempo',val:s.time}];
-  var y=40;
-  stats.forEach(function(st){
-    ctx.fillStyle='rgba(255,255,255,0.65)'; ctx.font='bold 30px system-ui'; ctx.textAlign='center';
-    ctx.fillText(st.lbl, W/2, y+30);
-    ctx.fillStyle='#ffffff'; ctx.font='bold 96px system-ui,-apple-system,sans-serif';
-    ctx.fillText(st.val, W/2, y+136);
-    y+=178;
-    ctx.fillStyle='rgba(255,255,255,0.15)'; ctx.fillRect(40,y,W-80,1);
-    y+=18;
+  // 3 stats empilhados — label pequeno, valor grande, linha horizontal ENTRE eles (não acima do primeiro)
+  var stats=[
+    {lbl:'Distância', val:s.dist},
+    {lbl:'Ritmo',     val:s.pace},
+    {lbl:'Tempo',     val:s.time},
+  ];
+  var y = 40;
+  stats.forEach(function(st, i){
+    // Label
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font      = 'bold 28px system-ui,-apple-system,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(st.lbl, W/2, y + 32);
+    // Valor
+    ctx.fillStyle = '#ffffff';
+    ctx.font      = 'bold 96px system-ui,-apple-system,sans-serif';
+    ctx.fillText(st.val, W/2, y + 140);
+    y += 180;
+    // Linha horizontal SÓ entre stats (não após o último)
+    if(i < stats.length - 1){
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      y += 14;
+    }
   });
 
-  // route map
-  var mapY=y+12, mapH=H-mapY-80;
-  var routeCV=drawRouteCanvas(W-60, mapH, '#ff6b00', 5);
+  // Mapa abaixo dos stats
+  var mapY = y + 16;
+  var mapH = H - mapY - 90;
+  var routeCV = drawRouteCanvas(W-60, mapH, '#ff6b00', 5);
   ctx.drawImage(routeCV, 30, mapY);
 
-  // JACKE RUN footer centered
-  drawShoeIcon(ctx,(W/2)-100, H-68, 48, '#ffffff');
-  ctx.fillStyle='#ffffff'; ctx.font='bold 40px system-ui'; ctx.textAlign='left';
-  ctx.fillText('JACKE RUN', W/2-100+58, H-68+36);
+  // Rodapé: tênis + JACKE RUN centralizado
+  var shoeSize = 46;
+  var footY    = H - 70;
+  ctx.font = 'bold 38px system-ui,-apple-system,sans-serif';
+  var tw   = ctx.measureText('JACKE RUN').width;
+  var gx   = (W - (shoeSize + 10 + tw)) / 2;
+  drawShoeIcon(ctx, gx, footY, shoeSize, '#ffffff');
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'left';
+  ctx.fillText('JACKE RUN', gx + shoeSize + 10, footY + shoeSize * 0.72);
+
   return cv;
 }
 
