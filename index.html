@@ -780,7 +780,6 @@ function showFinish(completed){
   renderSplits();
   document.getElementById('finish-modal').style.display='flex';
   if(distKm>0) falar('Distância percorrida: '+distKm.toFixed(2)+' quilômetros. Velocidade média: '+avgKmh.toFixed(1)+' quilômetros por hora.');
-  saveCurrentActivity(completed);
   setTimeout(function(){ renderRouteMap(); initFlyover(); }, 150);
 }
 
@@ -788,12 +787,23 @@ function renderSplits(){
   var wrap  = document.getElementById('splits-wrap');
   var tbody = document.getElementById('splits-tbody');
 
-  // ── Fallback APENAS se não há nenhum dado real de GPS ──
-  // Se routePoints tem dados, significa que o GPS funcionou — não usar fallback
   var hasRealGPS = routePoints.length > 5;
 
+  // Se tem GPS mas kmSplits vazio (correu <1km), cria um parcial único com distância real
+  if(kmSplits.length === 0 && hasRealGPS && totalDist > 50){
+    var distKm = totalDist / 1000;
+    var avgPaceSec = elapsed > 0 && distKm > 0 ? (elapsed / distKm) : 0;
+    if(avgPaceSec > 0){
+      kmSplits.push({
+        km: distKm.toFixed(2),
+        paceStr: secToPace(avgPaceSec),
+        paceSec: avgPaceSec
+      });
+    }
+  }
+
+  // Sem GPS: estima baseado no tempo real decorrido
   if(kmSplits.length === 0 && !hasRealGPS){
-    // Sem GPS: estima parciais baseado no tempo real decorrido
     var est = [];
     var elapsedSec = elapsed;
     var accSec = 0;
@@ -824,7 +834,7 @@ function renderSplits(){
 
   tbody.innerHTML = '';
 
-  // Título indica se é dado real ou estimado
+  // Atualiza título
   var titleEl = wrap.querySelector('.splits-main-title');
   if(titleEl){
     var hasEstimated = kmSplits.some(function(s){ return s.estimated; });
