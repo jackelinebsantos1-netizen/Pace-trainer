@@ -276,7 +276,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
   <div id="finish-map-wrap" style="width:100%;max-width:480px;border-radius:12px;overflow:hidden;border:1px solid var(--border);display:none">
     <div id="finish-map" style="width:100%;height:220px;background:var(--surface2)"></div>
   </div>
-  <div id="splits-wrap" style="width:100%;max-width:480px;display:none;background:var(--surface);border-radius:14px;padding:20px 16px 8px;overflow:hidden">
+  <div id="splits-wrap" style="width:100%;max-width:480px;display:none;background:var(--surface);border-radius:14px;padding:20px 16px 12px">
     <div style="font-size:1.6rem;font-weight:900;color:var(--text);margin-bottom:18px;letter-spacing:-.01em">Parciais</div>
     <div style="display:flex;gap:0;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.15);margin-bottom:4px">
       <div style="width:52px;font-family:'Courier New',monospace;font-size:.78rem;color:var(--muted)">Km</div>
@@ -785,22 +785,32 @@ function showFinish(completed){
 }
 
 function renderSplits(){
-  var wrap   = document.getElementById('splits-wrap');
-  var tbody  = document.getElementById('splits-tbody');
+  var wrap  = document.getElementById('splits-wrap');
+  var tbody = document.getElementById('splits-tbody');
 
-  // ── Fallback: estimate splits from block config if no GPS ──
+  // ── Fallback: usa blocos configurados SÓ se realmente correu a distância ──
+  // Apenas mostra parciais reais do GPS (kmSplits preenchido por onGPS)
+  // Se não há GPS, mostra parciais estimados apenas das distâncias realmente planejadas
+  // mas limitado ao tempo decorrido real
   if(kmSplits.length === 0){
     var est = [];
+    var elapsedMin = elapsed / 60; // minutos reais corridos
+    var accMin = 0;
     blocks.forEach(function(b){
       if(!paceValid(b.pace)) return;
-      var paceSec = paceToSec(b.pace);
-      var distKm  = (b.duration * 60) / paceSec;
-      var full    = Math.floor(distKm);
+      var paceSec  = paceToSec(b.pace);
+      var blockMin = b.duration;
+      // quanto deste bloco realmente foi corrido
+      var runMin   = Math.min(blockMin, Math.max(0, elapsedMin - accMin));
+      accMin += blockMin;
+      if(runMin <= 0) return;
+      var distKm = (runMin * 60) / paceSec;
+      var full   = Math.floor(distKm);
       for(var k=0; k<full; k++){
         est.push({km: est.length+1, paceStr: b.pace, paceSec: paceSec});
       }
       var rem = distKm - full;
-      if(rem > 0.05) est.push({km: '+'+rem.toFixed(1), paceStr: b.pace, paceSec: paceSec});
+      if(rem > 0.05) est.push({km: '+'+(rem).toFixed(1), paceStr: b.pace, paceSec: paceSec});
     });
     if(est.length > 0) kmSplits = est;
   }
@@ -815,28 +825,24 @@ function renderSplits(){
   tbody.innerHTML = '';
 
   kmSplits.forEach(function(s){
-    // bar width: fastest km = 100%, slowest = 30%
     var barPct = Math.round(30 + 70 * ((slowest - s.paceSec) / range));
 
     var row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)';
+    row.style.cssText = 'display:flex;align-items:center;padding:6px 0;';
 
-    // Km number
     var kmEl = document.createElement('div');
-    kmEl.style.cssText = 'width:52px;font-size:.95rem;font-weight:700;color:var(--text);font-family:"Courier New",monospace;flex-shrink:0';
+    kmEl.style.cssText = 'width:48px;font-size:.88rem;font-weight:700;color:var(--text);font-family:"Courier New",monospace;flex-shrink:0';
     kmEl.textContent = s.km;
 
-    // Pace
     var paceEl = document.createElement('div');
-    paceEl.style.cssText = 'width:76px;font-size:.95rem;color:var(--text);font-family:"Courier New",monospace;flex-shrink:0';
+    paceEl.style.cssText = 'width:72px;font-size:.88rem;color:var(--text);font-family:"Courier New",monospace;flex-shrink:0';
     paceEl.textContent = s.paceStr;
 
-    // Bar container
     var barWrap = document.createElement('div');
     barWrap.style.cssText = 'flex:1;padding-right:8px';
 
     var bar = document.createElement('div');
-    bar.style.cssText = 'height:28px;border-radius:6px;background:#3b82f6;width:'+barPct+'%;transition:width .6s ease';
+    bar.style.cssText = 'height:20px;border-radius:5px;background:#3b82f6;width:'+barPct+'%;transition:width .6s ease';
 
     barWrap.appendChild(bar);
     row.appendChild(kmEl);
@@ -846,7 +852,6 @@ function renderSplits(){
   });
 
   wrap.style.display = 'block';
-  // Force reflow so bars animate correctly
   wrap.offsetHeight;
 }
 
