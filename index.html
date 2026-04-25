@@ -226,12 +226,12 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
   <button onclick="applyUpdate()" style="background:var(--accent);color:#000;border:none;border-radius:8px;padding:8px 16px;font-weight:700;font-size:.8rem;cursor:pointer;white-space:nowrap">Atualizar agora</button>
 </div>
 
-<!-- INSTALL BANNER -->
+<!-- INSTALL BANNER (auto prompt) -->
 <div id="install-banner">
   <div class="ib-icon">📲</div>
   <div class="ib-text">
-    <strong>Instalar como app</strong>
-    <small>Adiciona ícone na tela inicial, funciona offline</small>
+    <strong>Instalar Jacke Run</strong>
+    <small>Adiciona à tela inicial, funciona offline</small>
   </div>
   <button class="ib-btn" id="install-btn">Instalar</button>
   <button class="ib-close" id="install-close">✕</button>
@@ -310,6 +310,12 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
     </div>
     <button class="gps-btn" id="setup-gps-btn" onclick="requestGPS()">Ativar GPS</button>
   </div>
+  <div id="manual-install-wrap" style="display:none;margin-bottom:12px">
+    <button id="manual-install-btn" style="width:100%;background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:12px 16px;cursor:pointer;color:var(--accent);font-weight:700;font-size:.9rem;display:flex;align-items:center;justify-content:center;gap:10px">
+      📲 Instalar Jacke Run no celular
+    </button>
+  </div>
+
   <div class="section-title">Blocos de treino</div>
   <div id="blocks-container"></div>
   <button class="add-btn" onclick="addBlock()">+ Adicionar bloco</button>
@@ -408,18 +414,45 @@ var mapboxToken=localStorage.getItem('mapbox_token')||'pk.eyJ1IjoiamFja2VsaW5lYn
 var wakeLock=null,deferredInstall=null;
 
 // ===== PWA INSTALL =====
+var deferredInstall=null;
+
+function triggerInstall(){
+  if(!deferredInstall){
+    alert('Para instalar:\n1. Toque no menu \u22ee do Chrome\n2. Selecione "Adicionar \u00e0 tela inicial"');
+    return;
+  }
+  deferredInstall.prompt();
+  deferredInstall.userChoice.then(function(choice){
+    if(choice.outcome==='accepted'){
+      document.getElementById('install-banner').classList.remove('show');
+      document.getElementById('manual-install-wrap').style.display='none';
+    }
+    deferredInstall=null;
+  });
+}
+
 window.addEventListener('beforeinstallprompt',function(e){
   e.preventDefault(); deferredInstall=e;
   document.getElementById('install-banner').classList.add('show');
+  document.getElementById('manual-install-wrap').style.display='block';
 });
-document.getElementById('install-btn').addEventListener('click',function(){
-  if(!deferredInstall) return;
-  deferredInstall.prompt();
-  deferredInstall.userChoice.then(function(){ document.getElementById('install-banner').classList.remove('show'); deferredInstall=null; });
+document.getElementById('install-btn').addEventListener('click', triggerInstall);
+document.getElementById('manual-install-btn').addEventListener('click', triggerInstall);
+document.getElementById('install-close').addEventListener('click',function(){
+  document.getElementById('install-banner').classList.remove('show');
 });
-document.getElementById('install-close').addEventListener('click',function(){ document.getElementById('install-banner').classList.remove('show'); });
-document.getElementById('finish-new-btn').addEventListener('click',function(){ closeFinish(); startWorkout(); });
-document.getElementById('finish-exit-btn').addEventListener('click',function(){ closeFinish(); });
+window.addEventListener('appinstalled',function(){
+  document.getElementById('install-banner').classList.remove('show');
+  document.getElementById('manual-install-wrap').style.display='none';
+  deferredInstall=null;
+});
+window.addEventListener('load',function(){
+  var isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
+  if(!isStandalone && /android|iphone|ipad/i.test(navigator.userAgent)){
+    document.getElementById('manual-install-wrap').style.display='block';
+  }
+});
+
 
 // ===== WAKE LOCK =====
 async function requestWakeLock(){
