@@ -277,7 +277,7 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
     <div id="finish-map" style="width:100%;height:220px;background:var(--surface2)"></div>
   </div>
   <div id="splits-wrap" style="width:100%;max-width:480px;display:none;background:var(--surface);border-radius:14px;padding:20px 16px 12px">
-    <div style="font-size:1.6rem;font-weight:900;color:var(--text);margin-bottom:18px;letter-spacing:-.01em">Parciais</div>
+    <div class="splits-main-title" style="font-size:1.6rem;font-weight:900;color:var(--text);margin-bottom:18px;letter-spacing:-.01em">Parciais</div>
     <div style="display:flex;gap:0;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.15);margin-bottom:4px">
       <div style="width:52px;font-family:'Courier New',monospace;font-size:.78rem;color:var(--muted)">Km</div>
       <div style="width:76px;font-family:'Courier New',monospace;font-size:.78rem;color:var(--muted)">Ritmo</div>
@@ -788,29 +788,29 @@ function renderSplits(){
   var wrap  = document.getElementById('splits-wrap');
   var tbody = document.getElementById('splits-tbody');
 
-  // ── Fallback: usa blocos configurados SÓ se realmente correu a distância ──
-  // Apenas mostra parciais reais do GPS (kmSplits preenchido por onGPS)
-  // Se não há GPS, mostra parciais estimados apenas das distâncias realmente planejadas
-  // mas limitado ao tempo decorrido real
-  if(kmSplits.length === 0){
+  // ── Fallback APENAS se não há nenhum dado real de GPS ──
+  // Se routePoints tem dados, significa que o GPS funcionou — não usar fallback
+  var hasRealGPS = routePoints.length > 5;
+
+  if(kmSplits.length === 0 && !hasRealGPS){
+    // Sem GPS: estima parciais baseado no tempo real decorrido
     var est = [];
-    var elapsedMin = elapsed / 60; // minutos reais corridos
-    var accMin = 0;
+    var elapsedSec = elapsed;
+    var accSec = 0;
     blocks.forEach(function(b){
       if(!paceValid(b.pace)) return;
       var paceSec  = paceToSec(b.pace);
-      var blockMin = b.duration;
-      // quanto deste bloco realmente foi corrido
-      var runMin   = Math.min(blockMin, Math.max(0, elapsedMin - accMin));
-      accMin += blockMin;
-      if(runMin <= 0) return;
-      var distKm = (runMin * 60) / paceSec;
+      var blockSec = b.duration * 60;
+      var runSec   = Math.min(blockSec, Math.max(0, elapsedSec - accSec));
+      accSec += blockSec;
+      if(runSec <= 0) return;
+      var distKm = runSec / paceSec;
       var full   = Math.floor(distKm);
       for(var k=0; k<full; k++){
-        est.push({km: est.length+1, paceStr: b.pace, paceSec: paceSec});
+        est.push({km: est.length+1, paceStr: b.pace, paceSec: paceSec, estimated: true});
       }
       var rem = distKm - full;
-      if(rem > 0.05) est.push({km: '+'+(rem).toFixed(1), paceStr: b.pace, paceSec: paceSec});
+      if(rem > 0.05) est.push({km: '+'+(rem).toFixed(1), paceStr: b.pace, paceSec: paceSec, estimated: true});
     });
     if(est.length > 0) kmSplits = est;
   }
@@ -824,11 +824,18 @@ function renderSplits(){
 
   tbody.innerHTML = '';
 
+  // Título indica se é dado real ou estimado
+  var titleEl = wrap.querySelector('.splits-main-title');
+  if(titleEl){
+    var hasEstimated = kmSplits.some(function(s){ return s.estimated; });
+    titleEl.textContent = hasEstimated ? 'Parciais (estimado)' : 'Parciais';
+  }
+
   kmSplits.forEach(function(s){
     var barPct = Math.round(30 + 70 * ((slowest - s.paceSec) / range));
 
     var row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;padding:6px 0;';
+    row.style.cssText = 'display:flex;align-items:center;padding:6px 0';
 
     var kmEl = document.createElement('div');
     kmEl.style.cssText = 'width:48px;font-size:.88rem;font-weight:700;color:var(--text);font-family:"Courier New",monospace;flex-shrink:0';
