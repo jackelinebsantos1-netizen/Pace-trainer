@@ -911,7 +911,7 @@ function initMapboxMap(){
     style:'mapbox://styles/mapbox/satellite-streets-v12',
     center:center,
     zoom:16,
-    pitch:75,
+    pitch:80,
     bearing:0,
     antialias:true
   });
@@ -924,7 +924,7 @@ function initMapboxMap(){
       url:'mapbox://mapbox.mapbox-terrain-dem-v1',
       tileSize:512, maxzoom:14
     });
-    flyoverMap.setTerrain({source:'mapbox-dem', exaggeration:1.8});
+    flyoverMap.setTerrain({source:'mapbox-dem', exaggeration:4});
     flyoverMap.setFog({
       range:[0.5,10],
       color:'rgba(10,10,20,0.6)',
@@ -979,7 +979,7 @@ function initMapboxMap(){
 
     // fit overview primeiro
     var bounds=coords.reduce(function(b,pt){return b.extend(pt);},new mapboxgl.LngLatBounds(coords[0],coords[0]));
-    flyoverMap.fitBounds(bounds,{padding:60,pitch:60,duration:2000});
+    flyoverMap.fitBounds(bounds,{padding:40,pitch:75,duration:2500});
 
     document.getElementById('flyover-play-btn').disabled=false;
     document.getElementById('flyover-status').textContent='Iniciando voo...';
@@ -1053,7 +1053,7 @@ function startFlyover(){
     flyoverMap.easeTo({
       center:cur,
       zoom:17,
-      pitch:68,
+      pitch:76,
       bearing:bearing,
       duration:FLYOVER_SPEED+50,
       easing:function(t){return t*t*(3-2*t);} // smooth step

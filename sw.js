@@ -1,5 +1,5 @@
 // Mude este número toda vez que atualizar o app
-const CACHE = 'jacke-run-v16';
+const CACHE = 'jacke-run-v17';
 const FILES = ['/Pace-trainer/', '/Pace-trainer/index.html', '/Pace-trainer/manifest.json', '/Pace-trainer/corrida.png', '/Pace-trainer/icon-192.png', '/Pace-trainer/icon-512.png'];
 
 self.addEventListener('install', e => {
