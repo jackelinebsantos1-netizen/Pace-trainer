@@ -1302,24 +1302,27 @@ function card3(s){
   var lblY   = mapH + 86;   // y do label
   var valY   = mapH + 116;  // y do valor (label 22px + espaço 8px)
 
+  // Calcula o menor valFont entre todos os stats para usar o mesmo em todos
+  var valFont = 46;
+  stats.forEach(function(st){
+    var f = 46;
+    ctx.font = 'bold '+f+'px system-ui,-apple-system,sans-serif';
+    while(ctx.measureText(st.val).width > colW - 20 && f > 24){
+      f -= 2;
+      ctx.font = 'bold '+f+'px system-ui,-apple-system,sans-serif';
+    }
+    if(f < valFont) valFont = f;
+  });
+
+  // Desenha todos com a mesma fonte
   stats.forEach(function(st, i){
     var x = 14 + i * colW;
-
-    // label
     ctx.fillStyle = 'rgba(255,255,255,0.6)';
     ctx.font      = '500 22px system-ui,-apple-system,sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(st.lbl, x, lblY);
-
-    // valor — tamanho dinâmico para caber na coluna
-    // colW ≈ 186px, texto não pode ultrapassar isso
-    var valFont = 46;
-    ctx.font = 'bold '+valFont+'px system-ui,-apple-system,sans-serif';
-    while(ctx.measureText(st.val).width > colW - 20 && valFont > 24){
-      valFont -= 2;
-      ctx.font = 'bold '+valFont+'px system-ui,-apple-system,sans-serif';
-    }
     ctx.fillStyle = '#ffffff';
+    ctx.font      = 'bold '+valFont+'px system-ui,-apple-system,sans-serif';
     ctx.fillText(st.val, x, valY + valFont);
   });
 
