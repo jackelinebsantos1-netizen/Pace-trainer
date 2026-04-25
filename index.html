@@ -217,6 +217,9 @@ h1{font-size:clamp(2rem,8vw,3.2rem);font-weight:900;color:var(--accent);text-tra
 </head>
 <body>
 
+<!-- Preload shoe image -->
+<img id="shoe-img-cache" src="./corrida.png" style="display:none" crossorigin="anonymous">
+
 <!-- UPDATE BANNER -->
 <div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:#1c2026;border-bottom:2px solid var(--accent);z-index:99999;padding:12px 16px;align-items:center;gap:12px;justify-content:space-between">
   <div style="font-size:.85rem;color:var(--text)">🔄 <strong>Nova versão disponível!</strong></div>
@@ -1014,43 +1017,21 @@ function closeShareModal(){
   document.getElementById('share-modal').style.display='none';
 }
 
-// ── Shoe icon (vetorial, sem imagem externa) ──
+// ── Shoe icon: usa imagem corrida.png sem fundo ──
 function drawShoeIcon(ctx, x, y, size, color){
-  color = color||'#ffffff';
-  ctx.save();
-  ctx.translate(x, y);
-  var s = size/40; // scale factor (design em 40x40)
-  ctx.strokeStyle = color;
-  ctx.fillStyle   = 'transparent';
-  ctx.lineWidth   = 2.5*s;
-  ctx.lineCap     = 'round';
-  ctx.lineJoin    = 'round';
-  // Sole
-  ctx.beginPath();
-  ctx.moveTo(4*s,32*s);
-  ctx.bezierCurveTo(4*s,36*s, 10*s,38*s, 20*s,38*s);
-  ctx.bezierCurveTo(30*s,38*s, 36*s,36*s, 36*s,32*s);
-  ctx.stroke();
-  // Upper body
-  ctx.beginPath();
-  ctx.moveTo(6*s,32*s);
-  ctx.bezierCurveTo(6*s,24*s, 10*s,18*s, 18*s,16*s);
-  ctx.bezierCurveTo(24*s,14*s, 30*s,16*s, 34*s,20*s);
-  ctx.lineTo(36*s,32*s);
-  ctx.stroke();
-  // Laces
-  ctx.beginPath();
-  ctx.moveTo(14*s,20*s); ctx.lineTo(26*s,20*s);
-  ctx.moveTo(13*s,24*s); ctx.lineTo(27*s,24*s);
-  ctx.moveTo(14*s,28*s); ctx.lineTo(28*s,28*s);
-  ctx.stroke();
-  // Tongue/top
-  ctx.beginPath();
-  ctx.moveTo(18*s,16*s);
-  ctx.bezierCurveTo(16*s,10*s, 14*s,6*s, 10*s,4*s);
-  ctx.bezierCurveTo(8*s,2*s, 6*s,4*s, 6*s,8*s);
-  ctx.stroke();
-  ctx.restore();
+  var img = document.getElementById('shoe-img-cache');
+  if(img && img.complete && img.naturalWidth > 0){
+    // imagem tem proporção ~98x109, calcular altura proporcional
+    var ratio = img.naturalHeight / img.naturalWidth;
+    ctx.drawImage(img, x, y, size, size * ratio);
+  } else {
+    // fallback: círculo simples se imagem não carregou
+    ctx.beginPath();
+    ctx.arc(x + size/2, y + size/2, size/2, 0, Math.PI*2);
+    ctx.strokeStyle = color||'#ffffff';
+    ctx.lineWidth = size/12;
+    ctx.stroke();
+  }
 }
 
 // ── Draw route ──
@@ -1325,6 +1306,14 @@ function applyUpdate(){
 
 // ===== INIT =====
 renderBlocks(); updateSummary();
+// Ensure shoe image is loaded
+var shoePreload = document.getElementById('shoe-img-cache');
+if(shoePreload && !shoePreload.complete){
+  shoePreload.onload = function(){
+    // image ready — cards will use it when generated
+    console.log('Shoe image loaded');
+  };
+}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
